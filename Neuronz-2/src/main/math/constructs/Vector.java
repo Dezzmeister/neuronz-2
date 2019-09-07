@@ -1,13 +1,14 @@
 package main.math.constructs;
 
 import main.math.utility.DimensionMismatchException;
+import main.math.utility.FloatOperator;
 
 /**
  * Represents a Vector with any number of elements.
  *
  * @author Joe Desmond
  */
-public final class Vector {
+public final class Vector implements ElementContainer<Vector> {
 	/**
 	 * The components of the Vector, these should not change.
 	 */
@@ -92,5 +93,28 @@ public final class Vector {
 		}
 		
 		return out + components[components.length - 1] + ")";
+	}
+	
+	/**
+	 * Applies an operation to each element of this Vector and another. Throws a {@link DimensionMismatchException} if the dimension of this Vector
+	 * does not match the dimension of <code>other</code>. Elements from this Vector are passed in as <code>a</code>, and elements from the other Vector
+	 * are passed in as <code>b</code>.
+	 * 
+	 * @param other other Vector
+	 * @param operator operation to be applied
+	 * @return the result of the operation
+	 */
+	@Override
+	public final Vector elementOperation(final Vector other, final FloatOperator operator) {
+		if (dimension != other.dimension) {
+			throw new DimensionMismatchException("Vectors must have same dimensions to perform element operations!");
+		}
+		
+		final float[] result = new float[dimension];
+		for (int i = 0; i < dimension; i++) {
+			result[i] = operator.operate(components[i], other.components[i]);
+		}
+		
+		return new Vector(result);
 	}
 }

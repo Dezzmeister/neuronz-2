@@ -8,7 +8,7 @@ import main.math.utility.FloatOperator;
  *
  * @author Joe Desmond
  */
-public final class Matrix {
+public final class Matrix implements ElementContainer<Matrix> {
 	/**
 	 * The values of the matrix
 	 */
@@ -20,7 +20,7 @@ public final class Matrix {
 	public final int rows;
 	
 	/**
-	 * Number of columns in the matrix
+	 * Number of columns in the matrix. If the matrix is irregular, this will be -1.
 	 */
 	public final int cols;
 	
@@ -30,14 +30,54 @@ public final class Matrix {
 	private float determinant = Float.MAX_VALUE;
 	
 	/**
-	 * Creates a Matrix from the given values.
+	 * Creates a Matrix from the given values. If the rows are not the same length, {@link Matrix#cols} will be -1.
 	 * 
 	 * @param _values matrix values
 	 */
 	public Matrix(final float[][] _values) {
 		values = _values;
 		rows = values.length;
-		cols = values[0].length;
+		
+		int tempCols = values[0].length;
+		
+		int firstRowLength = values[0].length;
+		for (int row = 1; row < values.length; row++) {
+			if (values[row].length != firstRowLength) {
+				tempCols = -1;
+				break;
+			}
+		}
+		
+		cols = tempCols;
+	}
+	
+	/**
+	 * Creates a Matrix from the given row vectors. If the rows are not the same length, {@link Matrix#cols} will be -1.
+	 * 
+	 * @param vectors rows of the matrix
+	 */
+	public Matrix(final Vector[] vectors) {
+		values = new float[vectors.length][];
+		rows = vectors.length;
+		
+		int tempCols = vectors[0].dimension;
+		
+		int firstRowLength = vectors[0].dimension;
+		for (int row = 0; row < vectors.length; row++) {
+			final Vector vector = vectors[row];
+			
+			if (vector.dimension != firstRowLength) {
+				tempCols = -1;
+			}
+			
+			values[row] = new float[vector.dimension];
+			
+			for (int col = 0; col < vector.dimension; col++) {
+				values[row][col] = vector.get(col);
+			}
+		}
+		
+		cols = tempCols;
 	}
 	
 	/**
@@ -45,11 +85,21 @@ public final class Matrix {
 	 * within an acceptable range.
 	 * 
 	 * @param row must be greater than or equal to 0 and less than {@link Matrix#rows}
-	 * @param col must be greater than or equal to 0 and less than {@link Matrix#cols}
+	 * @param col must be greater than or equal to 0 and less than {@link Matrix#getRowDimension(row)}
 	 * @return the element at the given row and column
 	 */
 	public float get(int row, int col) {
 		return values[row][col];
+	}
+	
+	/**
+	 * Returns the dimension of a single row vector. Does not check to ensure that <code>row</code> is within an acceptable range.
+	 * 
+	 * @param row must be greater than or equal to 0 and less than {@link Matrix#rows}
+	 * @return the dimension of the row vector at the given row
+	 */
+	public float getRowDimension(int row) {
+		return values[row].length;
 	}
 	
 	/**
@@ -111,23 +161,13 @@ public final class Matrix {
 	}
 	
 	/**
-	 * Addition, represented as a {@link FloatOperator}
-	 */
-	private static final FloatOperator ADD = (a, b) -> a + b;
-	
-	/**
-	 * Subtraction, represented as a {@link FloatOperator}
-	 */
-	private static final FloatOperator SUBTRACT = (a, b) -> a - b;
-	
-	/**
 	 * Adds this Matrix to another.
 	 * 
 	 * @param other Matrix to be added to this Matrix
 	 * @return sum of <code>this</code> and <code>other</code>
 	 */
 	public final Matrix plus(final Matrix other) {
-		return elementOperation(other, ADD);
+		return elementOperation(other, FloatOperator.ADD);
 	}
 	
 	/**
@@ -137,7 +177,7 @@ public final class Matrix {
 	 * @return result of <code>(this - other)</code>
 	 */
 	public final Matrix minus(final Matrix other) {
-		return elementOperation(other, SUBTRACT);
+		return elementOperation(other, FloatOperator.SUBTRACT);
 	}
 	
 	/**
@@ -148,6 +188,7 @@ public final class Matrix {
 	 * @param operator operation to be performed on each element
 	 * @return a new Matrix with the result of the operation applied to each element and the same dimensions as this Matrix
 	 */
+	@Override
 	public final Matrix elementOperation(final Matrix other, final FloatOperator operator) {
 		if (!isSameDimensionsAs(other)) {
 			throw new DimensionMismatchException("Matrices must have the same dimensions to perform element operations!");
@@ -170,7 +211,7 @@ public final class Matrix {
 	 * @return true if this matrix and the other have the same dimensions
 	 */
 	public final boolean isSameDimensionsAs(final Matrix other) {
-		return rows == other.rows && cols == other.cols;
+		return rows == other.rows && cols == other.cols && cols != -1 && other.cols != -1;
 	}
 	
 	/**
