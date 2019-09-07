@@ -1,6 +1,7 @@
 package main.math.constructs;
 
 import main.math.utility.DimensionMismatchException;
+import main.math.utility.FloatApplier;
 import main.math.utility.FloatOperator;
 
 /**
@@ -88,8 +89,76 @@ public final class Matrix implements ElementContainer<Matrix> {
 	 * @param col must be greater than or equal to 0 and less than {@link Matrix#getRowDimension(row)}
 	 * @return the element at the given row and column
 	 */
-	public float get(int row, int col) {
+	public final float get(int row, int col) {
 		return values[row][col];
+	}
+	
+	/**
+	 * Returns a single row vector. Does not check to ensure that <code>row</code> is within an acceptable range.
+	 * 
+	 * @param row must be greater than or equal to 0 and less than {@link Matrix#rows}
+	 * @return the vector at the given row
+	 */
+	public final Vector getRowVector(int row) {
+		return new Vector(values[row]);
+	}
+	
+	/**
+	 * Returns a single column vector. Does not check to ensure that <code>col</code> is within an acceptable range or that this
+	 * Matrix is regular.
+	 * 
+	 * @param col must be greater than or equal to 0 and less that {@link Matrix#cols}
+	 * @return the vector at the given column
+	 */
+	public final Vector getColVector(int col) {
+		final float[] result = new float[values.length];
+		
+		for (int row = 0; row < values.length; row++) {
+			result[row] = values[row][col];
+		}
+		
+		return new Vector(result);
+	}
+	
+	/**
+	 * Multiplies this Matrix with another. Produces a matrix with the same number of rows as this matrix and {@link Matrix#rows other.cols} columns.
+	 * 
+	 * @param other other matrix to be multiplied
+	 * @return the product of <code>this</code> and <code>other</code>
+	 */
+	public final Matrix multiply(final Matrix other) {
+		final float[][] values = new float[rows][other.cols];
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < other.cols; col++) {
+				final Vector rowVec = getRowVector(row);
+				final Vector colVec = other.getColVector(col);
+				
+				values[row][col] = rowVec.innerProduct(colVec);
+			}
+		}
+		
+		return new Matrix(values);
+	}
+	
+	/**
+	 * Multiplies this Matrix by a column Vector.
+	 * 
+	 * @param vector column vector
+	 * @return <code>this * vector</code>
+	 */
+	public final Vector multiply(final Vector vector) {
+		if (vector.dimension != cols) {
+			throw new DimensionMismatchException("Vector must have the same number of components as the matrix's number of columns!");
+		}
+		
+		final float[] result = new float[rows];
+		
+		for (int row = 0; row < rows; row++) {
+			result[row] = vector.innerProduct(getRowVector(row));
+		}
+		
+		return new Vector(result);
 	}
 	
 	/**
@@ -98,12 +167,12 @@ public final class Matrix implements ElementContainer<Matrix> {
 	 * @param row must be greater than or equal to 0 and less than {@link Matrix#rows}
 	 * @return the dimension of the row vector at the given row
 	 */
-	public float getRowDimension(int row) {
+	public final float getRowDimension(int row) {
 		return values[row].length;
 	}
 	
 	/**
-	 * Calculates the determinant of a Matrix if it has not yet been calculated for this Matrix. Otherwise returns the previously calculated determinant.
+	 * Recursively calculates the determinant of a Matrix if it has not yet been calculated for this Matrix. Otherwise returns the previously calculated determinant.
 	 * Throws a {@link DimensionMismatchException} if this Matrix is not a square matrix.
 	 * 
 	 * @return the determinant of this Matrix
@@ -198,6 +267,19 @@ public final class Matrix implements ElementContainer<Matrix> {
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				result[row][col] = operator.operate(values[row][col], other.values[row][col]);
+			}
+		}
+		
+		return new Matrix(result);
+	}
+	
+	@Override
+	public final Matrix transform(final FloatApplier operator) {
+		final float[][] result = new float[rows][cols];
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				result[row][col] = operator.apply(values[row][col]);
 			}
 		}
 		

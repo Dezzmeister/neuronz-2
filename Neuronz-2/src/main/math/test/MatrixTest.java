@@ -1,6 +1,7 @@
 package main.math.test;
 
 import main.math.constructs.Matrix;
+import main.math.constructs.Vector;
 import test.TestUtils;
 
 /**
@@ -44,5 +45,42 @@ public final class MatrixTest {
 		});
 		System.out.println("Determinant should be -22423.312");
 		System.out.println(TestUtils.closeEnough(m2.determinant(), -22423.312f, EPSILON) ? "Test passed!" : "Test failed!");
+		System.out.println();
+		
+		System.out.println("M3: ");
+		final Matrix m3 = new Matrix(new float[][] {
+			{1, 2, 3},
+			{4, 5, 6}
+		});
+		System.out.println(m3);
+		
+		System.out.println("\nM4: ");
+		final Matrix m4 = new Matrix(new float[][] {
+			{7, 8},
+			{9, 10},
+			{11, 12}
+		});
+		System.out.println(m4);
+		
+		System.out.println("\nM3 * M4: ");
+		System.out.println(m3.multiply(m4));
+		System.out.println();
+		
+		System.out.println("M5: ");
+		final Matrix m5 = new Matrix(new float[][] {
+			{1, 2, 3},
+			{4, 5, 6},
+			{7, 8, 9},
+			{10, 11, 12}
+		});
+		System.out.println(m5);
+		System.out.println();
+		
+		System.out.println("V0: ");
+		final Vector v0 = new Vector(-2, 1, 0);
+		System.out.println(v0);
+		System.out.println();
+		
+		System.out.println("M5 * v0: " + m5.multiply(v0));
 	}
 }

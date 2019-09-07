@@ -1,6 +1,7 @@
 package main.math.constructs;
 
 import main.math.utility.DimensionMismatchException;
+import main.math.utility.FloatApplier;
 import main.math.utility.FloatOperator;
 
 /**
@@ -82,17 +83,37 @@ public final class Vector implements ElementContainer<Vector> {
 	}
 	
 	/**
+	 * Adds this Vector to another.
+	 * 
+	 * @param other vector to be added to this
+	 * @return the sum of <code>this</code> and <code>other</code>
+	 */
+	public final Vector plus(final Vector other) {
+		return elementOperation(other, FloatOperator.ADD);
+	}
+	
+	/**
+	 * Subtracts another Vector from this Vector.
+	 * 
+	 * @param other Vector to be subtracted from this Vector
+	 * @return result of <code>(this - other)</code>
+	 */
+	public final Vector minus(final Vector other) {
+		return elementOperation(other, FloatOperator.SUBTRACT);
+	}
+	
+	/**
 	 * Converts this Vector into an easily readable format.
 	 */
 	@Override
 	public String toString() {
-		String out = "(";
+		String out = "[";
 		
 		for (int i = 0; i < components.length - 1; i++) {
 			out += components[i] + ", ";
 		}
 		
-		return out + components[components.length - 1] + ")";
+		return out + components[components.length - 1] + "]";
 	}
 	
 	/**
@@ -113,6 +134,17 @@ public final class Vector implements ElementContainer<Vector> {
 		final float[] result = new float[dimension];
 		for (int i = 0; i < dimension; i++) {
 			result[i] = operator.operate(components[i], other.components[i]);
+		}
+		
+		return new Vector(result);
+	}
+	
+	@Override
+	public final Vector transform(final FloatApplier operator) {
+		final float[] result = new float[dimension];
+		
+		for (int i = 0; i < components.length; i++) {
+			result[i] = operator.apply(components[i]);
 		}
 		
 		return new Vector(result);
