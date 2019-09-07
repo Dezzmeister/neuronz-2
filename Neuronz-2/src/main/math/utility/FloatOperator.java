@@ -9,16 +9,6 @@ package main.math.utility;
 public interface FloatOperator {
 	
 	/**
-	 * Addition, represented as a FloatOperator
-	 */
-	public static final FloatOperator ADD = (a, b) -> a + b;
-	
-	/**
-	 * Subtraction, represented as a FloatOperator
-	 */
-	public static final FloatOperator SUBTRACT = (a, b) -> a - b;
-	
-	/**
 	 * Operates on <code>a</code> and <code>b</code>.
 	 * 
 	 * @param a first operand

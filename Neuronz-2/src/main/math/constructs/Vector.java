@@ -9,7 +9,7 @@ import main.math.utility.FloatOperator;
  *
  * @author Joe Desmond
  */
-public final class Vector implements ElementContainer<Vector> {
+public final class Vector extends ElementContainer<Vector> {
 	/**
 	 * The components of the Vector, these should not change.
 	 */
@@ -80,26 +80,6 @@ public final class Vector implements ElementContainer<Vector> {
 		}
 		
 		return (float) Math.sqrt(sum);
-	}
-	
-	/**
-	 * Adds this Vector to another.
-	 * 
-	 * @param other vector to be added to this
-	 * @return the sum of <code>this</code> and <code>other</code>
-	 */
-	public final Vector plus(final Vector other) {
-		return elementOperation(other, FloatOperator.ADD);
-	}
-	
-	/**
-	 * Subtracts another Vector from this Vector.
-	 * 
-	 * @param other Vector to be subtracted from this Vector
-	 * @return result of <code>(this - other)</code>
-	 */
-	public final Vector minus(final Vector other) {
-		return elementOperation(other, FloatOperator.SUBTRACT);
 	}
 	
 	/**

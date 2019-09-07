@@ -9,7 +9,7 @@ import main.math.utility.FloatOperator;
  *
  * @author Joe Desmond
  */
-public final class Matrix implements ElementContainer<Matrix> {
+public final class Matrix extends ElementContainer<Matrix> {
 	/**
 	 * The values of the matrix
 	 */
@@ -26,7 +26,7 @@ public final class Matrix implements ElementContainer<Matrix> {
 	public final int cols;
 	
 	/**
-	 * The determinant of this Matrix, the placeholder {@link Float#MAX_VALUE} signifies that the determinant has not been calculated or does not exist
+	 * The determinant of this Matrix; the placeholder {@link Float#MAX_VALUE} signifies that the determinant has not been calculated or does not exist
 	 */
 	private float determinant = Float.MAX_VALUE;
 	
@@ -227,26 +227,6 @@ public final class Matrix implements ElementContainer<Matrix> {
 	 */
 	public boolean isSquare() {
 		return rows == cols;
-	}
-	
-	/**
-	 * Adds this Matrix to another.
-	 * 
-	 * @param other Matrix to be added to this Matrix
-	 * @return sum of <code>this</code> and <code>other</code>
-	 */
-	public final Matrix plus(final Matrix other) {
-		return elementOperation(other, FloatOperator.ADD);
-	}
-	
-	/**
-	 * Subtracts another Matrix from this Matrix.
-	 * 
-	 * @param other Matrix to be subtracted from this Matrix
-	 * @return result of <code>(this - other)</code>
-	 */
-	public final Matrix minus(final Matrix other) {
-		return elementOperation(other, FloatOperator.SUBTRACT);
 	}
 	
 	/**
