@@ -14,12 +14,12 @@ public final class Network {
 	/**
 	 * The weight relationships between each neuron, as well as biases represented as the last column of each matrix.
 	 */
-	private final Tensor3 weightTensor;
+	public final Tensor3 weightTensor;
 	
 	/**
-	 * Creates a neural network with the specified layer sizes. The weights and biases are initialized to random normalized values.
+	 * Creates a neural network with the specified layer sizes. The weights and biases are initialized to random Standard Normal values.
 	 * 
-	 * @param layerSizes
+	 * @param layerSizes number of neurons in each layer, starting with the input layer and ending with the output layer
 	 */
 	public Network(final int ... layerSizes) {
 		if (layerSizes.length < 2) {
@@ -42,5 +42,14 @@ public final class Network {
 		}
 		
 		weightTensor = new Tensor3(weightMatrices);
+	}
+	
+	/**
+	 * Creates a neural network by directly settings the weights and biases.
+	 * 
+	 * @param _weightTensor weight tensor containing weights and biases for each layer
+	 */
+	public Network(final Tensor3 _weightTensor) {
+		weightTensor = _weightTensor;
 	}
 }

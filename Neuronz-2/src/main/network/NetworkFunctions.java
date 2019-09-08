@@ -2,6 +2,7 @@ package main.network;
 
 import main.math.constructs.Matrix;
 import main.math.constructs.Vector;
+import main.math.utility.FloatApplier;
 
 /**
  * Contains general mathematical functions for neural networks.
@@ -16,10 +17,11 @@ public final class NetworkFunctions {
 	 * @param weights weight matrix
 	 * @param prevActivation previous activation vector
 	 * @param biases biases
+	 * @param activationFunction activation function to squash the outputs
 	 * @return the output vector, <code>(weights * prevActivation + biases)</code>
 	 */
-	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final Vector biases) {
-		return weights.multiply(prevActivation).plus(biases);
+	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final Vector biases, final FloatApplier activationFunction) {
+		return weights.multiply(prevActivation).plus(biases).transform(activationFunction);
 	}
 	
 	/**
@@ -29,9 +31,10 @@ public final class NetworkFunctions {
 	 * 
 	 * @param weights weight matrix (potentially with biases in last column)
 	 * @param prevActivation previous activation vector (potentially with 1 as last component)
+	 * @param activationFunction activation function to squash the outputs
 	 * @return the output vector, <code>(weights * prevActivation)</code>
 	 */
-	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation) {
-		return weights.multiply(prevActivation);
+	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final FloatApplier activationFunction) {
+		return weights.multiply(prevActivation).transform(activationFunction);
 	}
 }

@@ -83,6 +83,24 @@ public final class Vector extends ElementContainer<Vector> {
 	}
 	
 	/**
+	 * Returns a new Vector with the specified value appended as an additional component.
+	 * 
+	 * @param value value to be appended
+	 * @return a new Vector, 1 dimension higher than this Vector
+	 */
+	public final Vector append(final float value) {
+		final float[] result = new float[dimension + 1];
+		
+		for (int i = 0; i < dimension; i++) {
+			result[i] = components[i];
+		}
+		
+		result[dimension] = value;
+		
+		return new Vector(result);
+	}
+	
+	/**
 	 * Converts this Vector into an easily readable format.
 	 */
 	@Override

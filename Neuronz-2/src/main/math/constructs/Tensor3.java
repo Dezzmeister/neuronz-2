@@ -26,7 +26,7 @@ public final class Tensor3 extends ElementContainer<Tensor3> {
 	 * 
 	 * @param _matrices values of the tensor
 	 */
-	public Tensor3(final Matrix[] _matrices) {
+	public Tensor3(final Matrix ... _matrices) {
 		matrices = _matrices;
 		dimension = matrices.length;
 	}
@@ -65,5 +65,22 @@ public final class Tensor3 extends ElementContainer<Tensor3> {
 		}
 		
 		return new Tensor3(result);
+	}
+	
+	@Override
+	public final String toString() {
+		String out = "[";
+		
+		for (int layer = 0; layer < dimension; layer++) {
+			out += matrices[layer].toString();
+			
+			if (layer != dimension - 1) {
+				out += "\n\n";
+			} else {
+				out += "]";
+			}
+		}
+		
+		return out;
 	}
 }
