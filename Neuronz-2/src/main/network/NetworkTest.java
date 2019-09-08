@@ -20,7 +20,7 @@ public final class NetworkTest {
 		
 		final Matrix layer1 = new Matrix(new float[][] {
 			{0.4f, 0.45f, 0.6f},
-			{0.5f, 0.55f, 0.6f}
+			{0.50f, 0.55f, 0.6f}
 		});
 		
 		final Tensor3 tensor0 = new Tensor3(layer0, layer1);
@@ -40,5 +40,28 @@ public final class NetworkTest {
 		
 		final float totalError0 = NetworkFunctions.computeTotalMSE(ideal0, activation2);
 		System.out.println("Total error: " + totalError0);
+		
+		final Vector errorOutputDeriv = activation2.elementOperation(ideal0, (actual, ideal) -> - (ideal - actual));
+		System.out.println("Partial derivative of error wrt output: " + errorOutputDeriv);
+		
+		final Vector sigmoidDeriv0 = activation2.transform(out -> out * (1 - out));
+		System.out.println("Partial derivative of output wrt input (layer 0): " + sigmoidDeriv0);
+		
+		final Matrix weightDeltas0 = errorOutputDeriv.hadamard(sigmoidDeriv0).outerProduct(activation1);
+		System.out.println("Weight gradients (layer 0): \n" + weightDeltas0);
+		
+		final float eta0 = 0.5f;
+		System.out.println("Learning rate: " + eta0);
+		
+		final Matrix newWeights0 = layer1.minus(weightDeltas0.transform(w -> w * eta0));
+		System.out.println("New weights (layer 0): \n" + newWeights0);
+		
+		System.out.println("Partial derivative of error wrt inputs: " + errorOutputDeriv.hadamard(sigmoidDeriv0));
+		System.out.println();
+		System.out.println("ALTERNATE");
+		System.out.println("Partial derivative of error wrt output: " + errorOutputDeriv);
+		
+		
+		//System.out.println();
 	}
 }

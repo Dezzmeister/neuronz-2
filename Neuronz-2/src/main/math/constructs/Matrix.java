@@ -57,7 +57,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * 
 	 * @param vectors rows of the matrix
 	 */
-	public Matrix(final Vector[] vectors) {
+	public Matrix(final Vector ... vectors) {
 		values = new float[vectors.length][];
 		rows = vectors.length;
 		

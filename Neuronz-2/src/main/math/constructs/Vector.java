@@ -57,6 +57,24 @@ public final class Vector extends ElementContainer<Vector> {
 	}
 	
 	/**
+	 * Calculates the outer (tensor) product of this Vector and another.
+	 * 
+	 * @param other other Vector
+	 * @return the tensor product of this Vector and <code>other</code>
+	 */
+	public final Matrix outerProduct(final Vector other) {
+		final float[][] result = new float[dimension][other.dimension];
+		
+		for (int row = 0; row < result.length; row++) {
+			for (int col = 0; col < result[0].length; col++) {
+				result[row][col] = components[row] * other.components[col];
+			}
+		}
+		
+		return new Matrix(result);
+	}
+	
+	/**
 	 * Returns the value of the component at the given index of this Vector. <br>
 	 * <b>This function does not check if <code>index</code> is within an acceptable range, an exception will be thrown if <code>index</code>
 	 * is negative or is greater than or equal to the length of this Vector!</b>
@@ -96,6 +114,26 @@ public final class Vector extends ElementContainer<Vector> {
 		}
 		
 		result[dimension] = value;
+		
+		return new Vector(result);
+	}
+	
+	/**
+	 * Appends another Vector to this one.
+	 * 
+	 * @param other vector to be appended
+	 * @return a new Vector with dimension <code>(this.dimension + other.dimension)</code>
+	 */
+	public final Vector append(final Vector other) {
+		final float[] result = new float[dimension + other.dimension];
+		
+		for (int i = 0; i < dimension; i++) {
+			result[i] = components[i];
+		}
+		
+		for (int i = dimension; i < result.length; i++) {
+			result[i] = other.components[i - dimension];
+		}
 		
 		return new Vector(result);
 	}

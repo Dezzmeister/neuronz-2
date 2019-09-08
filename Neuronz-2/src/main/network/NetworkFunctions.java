@@ -13,7 +13,7 @@ import main.math.utility.FloatOperator;
 public final class NetworkFunctions {
 	
 	/**
-	 * Computes the output vector for a layer of neurons given a weight matrix, the previous activation vector, and biases.
+	 * Computes the output vector for a layer of neurons given a weight matrix, the previous activation vector, biases, and an activation function.
 	 * 
 	 * @param weights weight matrix
 	 * @param prevActivation previous activation vector
@@ -26,12 +26,12 @@ public final class NetworkFunctions {
 	}
 	
 	/**
-	 * Computes the output vector for a layer of neurons given a weight matrix and the previous activation vector. This version of 
+	 * Computes the output vector for a layer of neurons given a weight matrix, the previous activation vector, and an activation function. This version of 
 	 * {@link NetworkFunctions#computeOutputVector} should be used when the last column of the weight matrix contains the biases
-	 * and the last component of the previous activation vector is 1.
+	 * and the last component of the previous activation vector is 1 (this will cause the biases to be added to the raw output of each neuron).
 	 * 
 	 * @param weights weight matrix (potentially with biases in last column)
-	 * @param prevActivation previous activation vector (potentially with 1 as last component)
+	 * @param prevActivation previous activation vector (with 1 as last component if biases are in the last column of the weight matrix)
 	 * @param activationFunction activation function to squash the outputs
 	 * @return the output vector, <code>(weights * prevActivation)</code>
 	 */

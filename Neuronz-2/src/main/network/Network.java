@@ -4,6 +4,7 @@ import java.util.Random;
 
 import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
+import main.math.constructs.Vector;
 
 /**
  * A neural network. The weights and biases of the network are represented as a rank 3 tensor.
@@ -42,6 +43,11 @@ public final class Network {
 		}
 		
 		weightTensor = new Tensor3(weightMatrices);
+	}
+	
+	public final Vector feedForward(final Vector input) {
+		//TODO: Implement this
+		return null;
 	}
 	
 	/**
