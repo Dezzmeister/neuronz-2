@@ -24,15 +24,21 @@ public final class NetworkTest {
 		});
 		
 		final Tensor3 tensor0 = new Tensor3(layer0, layer1);
-		System.out.println("Weight tensor:\n" + tensor0 + "\n");
+		System.out.println("Network tensor:\n" + tensor0 + "\n");
 		
 		final Vector activation0 = new Vector(0.05f, 0.1f, 1);
 		System.out.println("First activation vector: " + activation0);
 		
-		final Vector activation1 = NetworkFunctions.computeOutputVector(layer0, activation0, Functions::sigmoid).append(1);
+		final Vector activation1 = NetworkFunctions.computeOutputVector(layer0, activation0, Functions::sigmoid).append(1); //Append 1 (for biases)
 		System.out.println("Second activation vector: " + activation1);
 		
 		final Vector activation2 = NetworkFunctions.computeOutputVector(layer1, activation1, Functions::sigmoid);
 		System.out.println("Third activation vector: " + activation2);
+		
+		final Vector ideal0 = new Vector(0.01f, 0.99f);
+		System.out.println("Ideal output: " + ideal0);
+		
+		final float totalError0 = NetworkFunctions.computeTotalMSE(ideal0, activation2);
+		System.out.println("Total error: " + totalError0);
 	}
 }

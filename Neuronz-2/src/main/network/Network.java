@@ -6,20 +6,20 @@ import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
 
 /**
- * A neural network.
+ * A neural network. The weights and biases of the network are represented as a rank 3 tensor.
  *
  * @author Joe Desmond
  */
 public final class Network {
 	/**
-	 * The weight relationships between each neuron, as well as biases represented as the last column of each matrix.
+	 * The weight relationships between each neuron, as well as biases which are stored in the last column of each matrix.
 	 */
 	public final Tensor3 weightTensor;
 	
 	/**
 	 * Creates a neural network with the specified layer sizes. The weights and biases are initialized to random Standard Normal values.
 	 * 
-	 * @param layerSizes number of neurons in each layer, starting with the input layer and ending with the output layer
+	 * @param layerSizes number of neurons in each layer, starting with the input layer and ending with the output layer, with any number of hidden layers in between
 	 */
 	public Network(final int ... layerSizes) {
 		if (layerSizes.length < 2) {
