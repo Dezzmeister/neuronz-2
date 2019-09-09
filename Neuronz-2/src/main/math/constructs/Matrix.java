@@ -142,6 +142,23 @@ public final class Matrix extends ElementContainer<Matrix> {
 	}
 	
 	/**
+	 * Returns the transpose of this Matrix (every value is mirrored over the diagonal).
+	 * 
+	 * @return the transpose of this Matrix
+	 */
+	public final Matrix transpose() {
+		final float[][] result = new float[cols][rows];
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				result[col][row] = values[row][col];
+			}
+		}
+		
+		return new Matrix(result);
+	}
+	
+	/**
 	 * Multiplies this Matrix by a column Vector.
 	 * 
 	 * @param vector column vector

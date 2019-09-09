@@ -138,6 +138,14 @@ public final class Vector extends ElementContainer<Vector> {
 		return new Vector(result);
 	}
 	
+	public final Vector removeLastElement() {
+		final float[] result = new float[dimension - 1];
+		
+		System.arraycopy(components, 0, result, 0, dimension - 1);
+		
+		return new Vector(result);
+	}
+	
 	/**
 	 * Converts this Vector into an easily readable format.
 	 */
