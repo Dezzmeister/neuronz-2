@@ -40,6 +40,16 @@ public final class Tensor3 extends ElementContainer<Tensor3> {
 	public final Matrix getLayer(int index) {
 		return matrices[index];
 	}
+	
+	/**
+	 * Sets the layer at the given index to the given matrix.
+	 * 
+	 * @param index index of layer to be replaced
+	 * @param layer layer to replace previous layer at <code>index</code>
+	 */
+	public final void setLayer(int index, final Matrix layer) {
+		matrices[index] = layer;
+	}
 
 	@Override
 	public Tensor3 elementOperation(final Tensor3 other, final FloatOperator operator) {

@@ -10,9 +10,39 @@ import main.math.utility.Functions;
  *
  * @author Joe Desmond
  */
+@SuppressWarnings("unused")
 public final class NetworkTest {
 	
 	public static final void main(final String[] args) {
+		//manualTest();
+		networkClassTest();
+	}
+	
+	private static final void networkClassTest() {
+		final Matrix layer0 = new Matrix(new float[][] {
+			{0.15f, 0.2f, 0.35f},
+			{0.25f, 0.3f, 0.35f}
+		});
+		
+		final Matrix layer1 = new Matrix(new float[][] {
+			{0.4f, 0.45f, 0.6f},
+			{0.50f, 0.55f, 0.6f}
+		});
+		
+		final Tensor3 networkTensor = new Tensor3(layer0, layer1);
+		final Network network = new Network(networkTensor);
+		
+		final Vector input = new Vector(0.05f, 0.1f, 1);
+		final Vector ideal = new Vector(0.01f, 0.99f);
+		final float eta = 0.5f;
+		
+		for (int i = 0; i < 10000; i++) {
+			final Vector output = network.learn(eta, input, ideal);
+			System.out.println(output);
+		}
+	}
+	
+	private static final void manualTest() {
 		
 		
 		final Network network = new Network(2, 4, 3);
@@ -68,11 +98,10 @@ public final class NetworkTest {
 		System.out.println("New weights (layer 0): \n" + newWeights0);
 		System.out.println();
 		
+		
+		
 		final Vector activationDeriv1 = activation1.transform(out -> out * (1 - out));
 		System.out.println("Partial derivative of layer 1 outputs wrt layer 1 inputs: " + activationDeriv1);
-		
-		final Vector layerDeriv0 = layer0.transpose().multiply(activationDeriv1.removeLastElement());
-		System.out.println("Partial derivative of layer 0 outputs wrt layer 1 outputs: " + layerDeriv0);
 		
 		final Vector nextError0 = layer1.transpose().multiply(errorInputDeriv0);
 		System.out.println("Partial derivative of error wrt output (layer 1): " + nextError0);
