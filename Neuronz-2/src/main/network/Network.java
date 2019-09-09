@@ -38,7 +38,8 @@ public final class Network {
 			
 			for (int row = 0; row < weights.length; row++) {
 				for (int col = 0; col < weights[0].length; col++) {
-					weights[row][col] = (float) random.nextGaussian();
+					//weights[row][col] = (float) random.nextGaussian();
+					weights[row][col] = (float) Math.random();
 				}
 			}
 			

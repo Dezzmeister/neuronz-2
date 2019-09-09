@@ -1,5 +1,6 @@
 package main.network;
 
+import main.dataio.MnistLoader;
 import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
 import main.math.constructs.Vector;
@@ -15,7 +16,68 @@ public final class NetworkTest {
 	
 	public static final void main(final String[] args) {
 		//manualTest();
-		networkClassTest();
+		//networkClassTest();
+		//networkClassTest2();
+		mnistTest();
+	}
+	
+	private static final void mnistTest() {
+		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
+		
+		for (int i = 0; i < inputImages.length; i++) {
+			inputImages[i] = inputImages[i].append(1); //Append 1 for biases
+		}
+		
+		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
+		final Vector[] idealOutputs = new Vector[inputImages.length];
+		
+		for (int i = 0; i < expectedDigits.length; i++) {
+			final float[] values = new float[10];
+			values[expectedDigits[i]] = 1;
+			idealOutputs[i] = new Vector(values);
+		}
+		
+		final Network network = new Network(784, 30, 10);
+		final float learningRate = 3.0f;
+		
+		int batchSuccesses = 0;
+		final int batchSize = 100;
+		final int kMax = 10;
+		for (int i = 0; i < inputImages.length; i++) {
+			for (int k = 0; k < kMax; k++) {
+				final Vector output = network.learn(learningRate, inputImages[i], idealOutputs[i]);
+				int expectedDigit = expectedDigits[i];
+				
+				int highestDigit = 0;
+				for (int j = 0; j < output.length; j++) {
+					if (output.get(j) > output.get(highestDigit)) {
+						highestDigit = j;
+					}
+				}
+				
+				if (highestDigit == expectedDigit) {
+					batchSuccesses++;
+				}
+			}
+			
+			if (i != 0 && i % batchSize == 0) {
+				System.out.println(batchSuccesses + " successes in " + (batchSize * kMax) + " runs: " + (100.0f * batchSuccesses/(float)(batchSize * kMax)) + "%");
+				batchSuccesses = 0;
+			}
+		}
+	}
+	
+	private static final void networkClassTest2() {
+		final Network network = new Network(3, 10, 4, 3);
+		
+		final Vector input = new Vector(0.69f, 0.5f, 0.8f, 1.0f);
+		final Vector ideal = new Vector(0.5f, 0.15f, 0.75f);
+		final float eta = 0.5f;
+		
+		for (int i = 0; i < 10000; i++) {
+			final Vector output = network.learn(eta, input, ideal);
+			if (i % 100 == 0) System.out.println(output);
+		}
 	}
 	
 	private static final void networkClassTest() {
@@ -36,9 +98,9 @@ public final class NetworkTest {
 		final Vector ideal = new Vector(0.01f, 0.99f);
 		final float eta = 0.5f;
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 1000000; i++) {
 			final Vector output = network.learn(eta, input, ideal);
-			System.out.println(output);
+			if (i % 100000 == 0) System.out.println(output);
 		}
 	}
 	
