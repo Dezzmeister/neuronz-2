@@ -13,7 +13,7 @@ public final class FuncDerivPair {
 	 * The sigmoid activation function
 	 */
 	public static final FuncDerivPair SIGMOID = new FuncDerivPair(
-			x -> 1.0f/(float)(1.0f + Math.exp(-x)),
+			x -> 1.0f/(double)(1.0f + Math.exp(-x)),
 			sigmoid -> sigmoid * (1 - sigmoid)
 	);
 	
@@ -21,7 +21,7 @@ public final class FuncDerivPair {
 	 * Rectified Linear Unit activation function
 	 */
 	public static final FuncDerivPair RELU = new FuncDerivPair(
-			x -> (float)Math.max(0, x),
+			x -> (double)Math.max(0, x),
 			relu -> (relu == 0) ? 0 : 1
 	);
 	

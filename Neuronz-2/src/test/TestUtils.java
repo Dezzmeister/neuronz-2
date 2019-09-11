@@ -15,7 +15,7 @@ public final class TestUtils {
 	 * @param epsilon acceptable margin of error
 	 * @return true if the absolute value of <code>(test - target)</code> is less than or equal to <code>epsilon<code>
 	 */
-	public static final boolean closeEnough(final float test, final float target, final float epsilon) {
+	public static final boolean closeEnough(final double test, final double target, final double epsilon) {
 		return Math.abs(target - test) <= epsilon;
 	}
 }

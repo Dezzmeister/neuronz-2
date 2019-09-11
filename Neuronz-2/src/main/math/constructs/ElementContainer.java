@@ -4,7 +4,7 @@ import main.math.utility.FloatApplier;
 import main.math.utility.FloatOperator;
 
 /**
- * Represents anything that contains a collection of float elements.
+ * Represents anything that contains a collection of double elements.
  *
  * @author Joe Desmond
  */
@@ -13,7 +13,7 @@ public abstract class ElementContainer<T> {
 	/**
 	 * Performs an operation with each element of <code>this</code> and <code>other</code>.
 	 * 
-	 * @param other something containing float elements
+	 * @param other something containing double elements
 	 * @param operator operation to be performed on each pair of elements
 	 * @return the application of <code>operator</code> on <code>this</code> and <code>other</code>
 	 */

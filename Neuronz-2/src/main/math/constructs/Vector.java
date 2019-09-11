@@ -13,12 +13,12 @@ public final class Vector extends ElementContainer<Vector> {
 	/**
 	 * The components of the Vector, these should not change.
 	 */
-	private final float[] components;
+	private final double[] components;
 	
 	/**
 	 * The length of the Vector in space, calculated upon construction
 	 */
-	public final float length;
+	public final double length;
 	
 	/**
 	 * The number of components in this Vector
@@ -30,7 +30,7 @@ public final class Vector extends ElementContainer<Vector> {
 	 * 
 	 * @param _components the components of this vector
 	 */
-	public Vector(final float ... _components) {
+	public Vector(final double ... _components) {
 		components = _components;
 		dimension = components.length;
 		length = calculateLength();
@@ -43,12 +43,12 @@ public final class Vector extends ElementContainer<Vector> {
 	 * @param other other Vector
 	 * @return the dot product of this Vector and <code>other</code>
 	 */
-	public final float innerProduct(final Vector other) {
+	public final double innerProduct(final Vector other) {
 		if (dimension != other.dimension) {
 			throw new DimensionMismatchException("Vectors must have an equal number of components to calculate an inner product!");
 		}
 		
-		float sum = 0;
+		double sum = 0;
 		for (int i = 0; i < components.length; i++) {
 			sum += components[i] * other.components[i];
 		}
@@ -63,7 +63,7 @@ public final class Vector extends ElementContainer<Vector> {
 	 * @return the tensor product of this Vector and <code>other</code>
 	 */
 	public final Matrix outerProduct(final Vector other) {
-		final float[][] result = new float[dimension][other.dimension];
+		final double[][] result = new double[dimension][other.dimension];
 		
 		for (int row = 0; row < result.length; row++) {
 			for (int col = 0; col < result[0].length; col++) {
@@ -82,7 +82,7 @@ public final class Vector extends ElementContainer<Vector> {
 	 * @param index index of the component in this Vector
 	 * @return value of the component
 	 */
-	public final float get(final int index) {
+	public final double get(final int index) {
 		return components[index];
 	}
 	
@@ -91,13 +91,13 @@ public final class Vector extends ElementContainer<Vector> {
 	 * 
 	 * @return the length of this Vector
 	 */
-	private final float calculateLength() {
-		float sum = 0;
+	private final double calculateLength() {
+		double sum = 0;
 		for (int i = 0; i < components.length; i++) {
 			sum += (components[i] * components[i]);
 		}
 		
-		return (float) Math.sqrt(sum);
+		return (double) Math.sqrt(sum);
 	}
 	
 	/**
@@ -106,8 +106,8 @@ public final class Vector extends ElementContainer<Vector> {
 	 * @param value value to be appended
 	 * @return a new Vector, 1 dimension higher than this Vector
 	 */
-	public final Vector append(final float value) {
-		final float[] result = new float[dimension + 1];
+	public final Vector append(final double value) {
+		final double[] result = new double[dimension + 1];
 		
 		for (int i = 0; i < dimension; i++) {
 			result[i] = components[i];
@@ -125,7 +125,7 @@ public final class Vector extends ElementContainer<Vector> {
 	 * @return a new Vector with dimension <code>(this.dimension + other.dimension)</code>
 	 */
 	public final Vector append(final Vector other) {
-		final float[] result = new float[dimension + other.dimension];
+		final double[] result = new double[dimension + other.dimension];
 		
 		for (int i = 0; i < dimension; i++) {
 			result[i] = components[i];
@@ -138,10 +138,30 @@ public final class Vector extends ElementContainer<Vector> {
 		return new Vector(result);
 	}
 	
+	/**
+	 * Returns a copy of this Vector with the last element removed.
+	 * 
+	 * @return this Vector without the last element
+	 */
 	public final Vector removeLastElement() {
-		final float[] result = new float[dimension - 1];
+		final double[] result = new double[dimension - 1];
 		
 		System.arraycopy(components, 0, result, 0, dimension - 1);
+		
+		return new Vector(result);
+	}
+	
+	/**
+	 * Returns the Vector starting at the start index (inclusive) and ending at the end index (non-inclusive).
+	 * 
+	 * @param start index of first component (inclusive)
+	 * @param end index of last component (non-inclusive)
+	 * @return the vector from [start, end) in this vector
+	 */
+	public final Vector trim(final int start, final int end) {
+		final double[] result = new double[end - start];
+		
+		System.arraycopy(components, start, result, 0, result.length);
 		
 		return new Vector(result);
 	}
@@ -175,7 +195,7 @@ public final class Vector extends ElementContainer<Vector> {
 			throw new DimensionMismatchException("Vectors must have same dimensions to perform element operations!");
 		}
 		
-		final float[] result = new float[dimension];
+		final double[] result = new double[dimension];
 		for (int i = 0; i < dimension; i++) {
 			result[i] = operator.operate(components[i], other.components[i]);
 		}
@@ -185,7 +205,7 @@ public final class Vector extends ElementContainer<Vector> {
 	
 	@Override
 	public final Vector transform(final FloatApplier operator) {
-		final float[] result = new float[dimension];
+		final double[] result = new double[dimension];
 		
 		for (int i = 0; i < components.length; i++) {
 			result[i] = operator.apply(components[i]);

@@ -13,7 +13,7 @@ public final class MatrixTest {
 	/**
 	 * Acceptable margin of error when evaluating tests.
 	 */
-	private static final float EPSILON = 0.0001f;
+	private static final double EPSILON = 0.0001f;
 	
 	/**
 	 * Runs a series of tests on the {@link Matrix} class.
@@ -21,13 +21,13 @@ public final class MatrixTest {
 	 * @param args unused
 	 */
 	public static final void main(final String[] args) {
-		final Matrix m0 = new Matrix(new float[][] {{3, 8}, {4, 6}});
+		final Matrix m0 = new Matrix(new double[][] {{3, 8}, {4, 6}});
 		System.out.println(m0);
 		System.out.println("Determinant should be -14");
 		System.out.println((m0.determinant() == -14) ? "Test passed!" : "Test failed!");
 		System.out.println();
 		
-		final Matrix m1 = new Matrix(new float[][] {
+		final Matrix m1 = new Matrix(new double[][] {
 				 {6, 1, 1},
 				 {4, -2, 5},
 				 {2, 8, 7}
@@ -37,7 +37,7 @@ public final class MatrixTest {
 		System.out.println((m1.determinant() == -306) ? "Test passed!" : "Test failed!");
 		System.out.println();
 		
-		final Matrix m2 = new Matrix(new float[][] {
+		final Matrix m2 = new Matrix(new double[][] {
 			{1, -2.3f, 3, 4},
 			{-5, 6, -7.2f, 8},
 			{9.49f, 10.06f, 11, 12},
@@ -48,14 +48,14 @@ public final class MatrixTest {
 		System.out.println();
 		
 		System.out.println("M3: ");
-		final Matrix m3 = new Matrix(new float[][] {
+		final Matrix m3 = new Matrix(new double[][] {
 			{1, 2, 3},
 			{4, 5, 6}
 		});
 		System.out.println(m3);
 		
 		System.out.println("\nM4: ");
-		final Matrix m4 = new Matrix(new float[][] {
+		final Matrix m4 = new Matrix(new double[][] {
 			{7, 8},
 			{9, 10},
 			{11, 12}
@@ -67,7 +67,7 @@ public final class MatrixTest {
 		System.out.println();
 		
 		System.out.println("M5: ");
-		final Matrix m5 = new Matrix(new float[][] {
+		final Matrix m5 = new Matrix(new double[][] {
 			{1, 2, 3},
 			{4, 5, 6},
 			{7, 8, 9},

@@ -21,9 +21,9 @@ public final class VectorUtils {
 			throw new DimensionMismatchException("Cross product can only be calculated for Vectors with 3 components!");
 		}
 		
-		final float x = a.get(1) * b.get(2) - a.get(2) * b.get(1);
-		final float y = a.get(2) * b.get(0) - a.get(0) * b.get(2);
-		final float z = a.get(0) * b.get(1) - a.get(1) * b.get(0);
+		final double x = a.get(1) * b.get(2) - a.get(2) * b.get(1);
+		final double y = a.get(2) * b.get(0) - a.get(0) * b.get(2);
+		final double z = a.get(0) * b.get(1) - a.get(1) * b.get(0);
 		
 		return new Vector(x, y, z);
 	}

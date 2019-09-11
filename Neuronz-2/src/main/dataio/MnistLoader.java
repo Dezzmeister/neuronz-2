@@ -25,7 +25,7 @@ public final class MnistLoader {
 	
 	/**
 	 * Loads MNIST images from a file and returns a Vector array containing each image. Each image is stored in one Vector with pixels corresponding to Vector components.
-	 * The pixel colors are grayscale, normalized floats.
+	 * The pixel colors are grayscale, normalized doubles.
 	 * 
 	 * @param imagePath path to image file
 	 * @return MNIST images
@@ -50,10 +50,10 @@ public final class MnistLoader {
 			data = new Vector[items];
 			
 			for (int i = 0; i < items; i++) {
-				float[] image = new float[rows * cols];
+				double[] image = new double[rows * cols];
 				
 				for (int pixel = 0; pixel < (rows * cols); pixel++) {
-					image[pixel] = unsigned(file[(pixel + offset + (i * rows * cols))])/255.0f;
+					image[pixel] = unsigned(file[(pixel + offset + (i * rows * cols))]) > 127 ? 1 : -1;
 				}
 				
 				data[i] = new Vector(image);

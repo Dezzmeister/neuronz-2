@@ -13,7 +13,7 @@ public final class Functions {
 	 * @param x input
 	 * @return 1/(1 + e^-x)
 	 */
-	public static final float sigmoid(float x) {
-		return 1.0f/(float)(1.0f + Math.exp(-x));
+	public static final double sigmoid(double x) {
+		return 1.0f/(double)(1.0f + Math.exp(-x));
 	}
 }

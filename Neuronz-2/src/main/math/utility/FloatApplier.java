@@ -1,7 +1,7 @@
 package main.math.utility;
 
 /**
- * Represents a function that takes one float and returns a float result.
+ * Represents a function that takes one double and returns a double result.
  *
  * @author Joe Desmond
  */
@@ -9,10 +9,10 @@ package main.math.utility;
 public interface FloatApplier {
 	
 	/**
-	 * Applies an operation to a float.
+	 * Applies an operation to a double.
 	 * 
 	 * @param a input
 	 * @return result
 	 */
-	float apply(final float a);
+	double apply(final double a);
 }

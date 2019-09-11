@@ -1,7 +1,7 @@
 package main.math.utility;
 
 /**
- * Represents a function that operates on two floats and returns a float result.
+ * Represents a function that operates on two doubles and returns a double result.
  *
  * @author Joe Desmond
  */
@@ -13,7 +13,7 @@ public interface FloatOperator {
 	 * 
 	 * @param a first operand
 	 * @param b second operand
-	 * @return a float
+	 * @return a double
 	 */
-	float operate(final float a, final float b);
+	double operate(final double a, final double b);
 }

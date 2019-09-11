@@ -13,7 +13,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	/**
 	 * The values of the matrix
 	 */
-	private final float[][] values;
+	private final double[][] values;
 	
 	/**
 	 * Number of rows in the matrix
@@ -28,14 +28,14 @@ public final class Matrix extends ElementContainer<Matrix> {
 	/**
 	 * The determinant of this Matrix; the placeholder {@link Float#MAX_VALUE} signifies that the determinant has not been calculated or does not exist
 	 */
-	private float determinant = Float.MAX_VALUE;
+	private double determinant = Float.MAX_VALUE;
 	
 	/**
 	 * Creates a Matrix from the given values. If the rows are not the same length, {@link Matrix#cols} will be -1.
 	 * 
 	 * @param _values matrix values
 	 */
-	public Matrix(final float[][] _values) {
+	public Matrix(final double[][] _values) {
 		values = _values;
 		rows = values.length;
 		
@@ -58,7 +58,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @param vectors rows of the matrix
 	 */
 	public Matrix(final Vector ... vectors) {
-		values = new float[vectors.length][];
+		values = new double[vectors.length][];
 		rows = vectors.length;
 		
 		int tempCols = vectors[0].dimension;
@@ -71,7 +71,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 				tempCols = -1;
 			}
 			
-			values[row] = new float[vector.dimension];
+			values[row] = new double[vector.dimension];
 			
 			for (int col = 0; col < vector.dimension; col++) {
 				values[row][col] = vector.get(col);
@@ -89,7 +89,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @param col must be greater than or equal to 0 and less than {@link Matrix#getRowDimension(row)}
 	 * @return the element at the given row and column
 	 */
-	public final float get(int row, int col) {
+	public final double get(int row, int col) {
 		return values[row][col];
 	}
 	
@@ -111,7 +111,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @return the vector at the given column
 	 */
 	public final Vector getColVector(int col) {
-		final float[] result = new float[values.length];
+		final double[] result = new double[values.length];
 		
 		for (int row = 0; row < values.length; row++) {
 			result[row] = values[row][col];
@@ -127,7 +127,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @return the product of <code>this</code> and <code>other</code>
 	 */
 	public final Matrix multiply(final Matrix other) {
-		final float[][] values = new float[rows][other.cols];
+		final double[][] values = new double[rows][other.cols];
 		
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < other.cols; col++) {
@@ -147,7 +147,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @return the transpose of this Matrix
 	 */
 	public final Matrix transpose() {
-		final float[][] result = new float[cols][rows];
+		final double[][] result = new double[cols][rows];
 		
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
@@ -169,7 +169,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 			throw new DimensionMismatchException("Vector must have the same number of components as the matrix's number of columns!");
 		}
 		
-		final float[] result = new float[rows];
+		final double[] result = new double[rows];
 		
 		for (int row = 0; row < rows; row++) {
 			result[row] = vector.innerProduct(getRowVector(row));
@@ -184,7 +184,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @param row must be greater than or equal to 0 and less than {@link Matrix#rows}
 	 * @return the dimension of the row vector at the given row
 	 */
-	public final float getRowDimension(int row) {
+	public final double getRowDimension(int row) {
 		return values[row].length;
 	}
 	
@@ -194,7 +194,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * 
 	 * @return the determinant of this Matrix
 	 */
-	public final float determinant() {		
+	public final double determinant() {		
 		if (!isSquare()) {
 			throw new DimensionMismatchException("Determinant can only be calculated for a square matrix!");
 		}
@@ -210,10 +210,10 @@ public final class Matrix extends ElementContainer<Matrix> {
 		} else if (rows <= 1) {
 			return 0;
 		} else {
-			float determinant = 0;
+			double determinant = 0;
 			
 			for (int col = 0; col < cols; col++) {
-				final float[][] smallMatrixValues = new float[rows - 1][cols - 1];
+				final double[][] smallMatrixValues = new double[rows - 1][cols - 1];
 				
 				for (int row = 1; row < rows; row++) {
 					
@@ -226,9 +226,9 @@ public final class Matrix extends ElementContainer<Matrix> {
 					}
 				}
 				
-				float smallMatrixDeterminant = new Matrix(smallMatrixValues).determinant();
-				float colElement = values[0][col];
-				float elementDeterminant = smallMatrixDeterminant * colElement;
+				double smallMatrixDeterminant = new Matrix(smallMatrixValues).determinant();
+				double colElement = values[0][col];
+				double elementDeterminant = smallMatrixDeterminant * colElement;
 				
 				determinant += (col % 2 == 0) ? elementDeterminant : -elementDeterminant;
 			}
@@ -260,7 +260,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 			throw new DimensionMismatchException("Matrices must have the same dimensions to perform element operations!");
 		}
 		
-		final float[][] result = new float[rows][cols];
+		final double[][] result = new double[rows][cols];
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				result[row][col] = operator.operate(values[row][col], other.values[row][col]);
@@ -272,7 +272,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	
 	@Override
 	public final Matrix transform(final FloatApplier operator) {
-		final float[][] result = new float[rows][cols];
+		final double[][] result = new double[rows][cols];
 		
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
