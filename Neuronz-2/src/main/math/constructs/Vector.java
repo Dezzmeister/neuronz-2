@@ -1,8 +1,8 @@
 package main.math.constructs;
 
 import main.math.utility.DimensionMismatchException;
-import main.math.utility.FloatApplier;
-import main.math.utility.FloatOperator;
+import main.math.utility.DoubleApplier;
+import main.math.utility.DoubleOperator;
 
 /**
  * Represents a Vector with any number of elements.
@@ -190,7 +190,7 @@ public final class Vector extends ElementContainer<Vector> {
 	 * @return the result of the operation
 	 */
 	@Override
-	public final Vector elementOperation(final Vector other, final FloatOperator operator) {
+	public final Vector elementOperation(final Vector other, final DoubleOperator operator) {
 		if (dimension != other.dimension) {
 			throw new DimensionMismatchException("Vectors must have same dimensions to perform element operations!");
 		}
@@ -204,7 +204,7 @@ public final class Vector extends ElementContainer<Vector> {
 	}
 	
 	@Override
-	public final Vector transform(final FloatApplier operator) {
+	public final Vector transform(final DoubleApplier operator) {
 		final double[] result = new double[dimension];
 		
 		for (int i = 0; i < components.length; i++) {

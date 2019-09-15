@@ -1,7 +1,7 @@
 package main.math.constructs;
 
-import main.math.utility.FloatApplier;
-import main.math.utility.FloatOperator;
+import main.math.utility.DoubleApplier;
+import main.math.utility.DoubleOperator;
 
 /**
  * Represents anything that contains a collection of double elements.
@@ -17,7 +17,7 @@ public abstract class ElementContainer<T> {
 	 * @param operator operation to be performed on each pair of elements
 	 * @return the application of <code>operator</code> on <code>this</code> and <code>other</code>
 	 */
-	public abstract T elementOperation(final T other, final FloatOperator operator);
+	public abstract T elementOperation(final T other, final DoubleOperator operator);
 	
 	/**
 	 * Performs an operation on each element of <code>this</code>.
@@ -25,21 +25,21 @@ public abstract class ElementContainer<T> {
 	 * @param transformation operation to be performed on each element
 	 * @return the application of <code>operator</code> on <code>this</code>
 	 */
-	public abstract T transform(final FloatApplier transformation);
+	public abstract T transform(final DoubleApplier transformation);
 	
 	/**
 	 * Addition, represented as a FloatOperator
 	 */
-	private static final FloatOperator ADD = (a, b) -> a + b;
+	private static final DoubleOperator ADD = (a, b) -> a + b;
 	
 	/**
 	 * Subtraction, represented as a FloatOperator
 	 */
-	private static final FloatOperator SUBTRACT = (a, b) -> a - b;
+	private static final DoubleOperator SUBTRACT = (a, b) -> a - b;
 	
-	private static final FloatOperator MULTIPLY = (a, b) -> a * b;
+	private static final DoubleOperator MULTIPLY = (a, b) -> a * b;
 	
-	private static final FloatOperator DIVIDE = (a, b) -> a / b;
+	private static final DoubleOperator DIVIDE = (a, b) -> a / b;
 	
 	/**
 	 * Adds <code>this</code> to <code>other</code>, element-wise.

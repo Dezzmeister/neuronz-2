@@ -6,7 +6,7 @@ package main.math.utility;
  * @author Joe Desmond
  */
 @FunctionalInterface
-public interface FloatApplier {
+public interface DoubleApplier {
 	
 	/**
 	 * Applies an operation to a double.

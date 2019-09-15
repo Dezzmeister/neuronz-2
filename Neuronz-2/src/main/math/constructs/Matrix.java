@@ -1,15 +1,22 @@
 package main.math.constructs;
 
+import java.io.Serializable;
+
 import main.math.utility.DimensionMismatchException;
-import main.math.utility.FloatApplier;
-import main.math.utility.FloatOperator;
+import main.math.utility.DoubleApplier;
+import main.math.utility.DoubleOperator;
 
 /**
  * A matrix with any number of rows and columns.
  *
  * @author Joe Desmond
  */
-public final class Matrix extends ElementContainer<Matrix> {
+public final class Matrix extends ElementContainer<Matrix> implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -874139546253134819L;
+
 	/**
 	 * The values of the matrix
 	 */
@@ -255,7 +262,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	 * @return a new Matrix with the result of the operation applied to each element and the same dimensions as this Matrix
 	 */
 	@Override
-	public final Matrix elementOperation(final Matrix other, final FloatOperator operator) {
+	public final Matrix elementOperation(final Matrix other, final DoubleOperator operator) {
 		if (!isSameDimensionsAs(other)) {
 			throw new DimensionMismatchException("Matrices must have the same dimensions to perform element operations!");
 		}
@@ -271,7 +278,7 @@ public final class Matrix extends ElementContainer<Matrix> {
 	}
 	
 	@Override
-	public final Matrix transform(final FloatApplier operator) {
+	public final Matrix transform(final DoubleApplier operator) {
 		final double[][] result = new double[rows][cols];
 		
 		for (int row = 0; row < rows; row++) {

@@ -53,7 +53,7 @@ public final class MnistLoader {
 				double[] image = new double[rows * cols];
 				
 				for (int pixel = 0; pixel < (rows * cols); pixel++) {
-					image[pixel] = unsigned(file[(pixel + offset + (i * rows * cols))]) > 127 ? 1 : -1;
+					image[pixel] = unsigned(file[(pixel + offset + (i * rows * cols))]) > 127 ? 1.5 : -1.5;
 				}
 				
 				data[i] = new Vector(image);

@@ -2,8 +2,8 @@ package main.network;
 
 import main.math.constructs.Matrix;
 import main.math.constructs.Vector;
-import main.math.utility.FloatApplier;
-import main.math.utility.FloatOperator;
+import main.math.utility.DoubleApplier;
+import main.math.utility.DoubleOperator;
 
 /**
  * Contains general mathematical functions for neural networks.
@@ -21,7 +21,7 @@ public final class NetworkFunctions {
 	 * @param activationFunction activation function to squash the outputs
 	 * @return the output vector, <code>(weights * prevActivation + biases)</code>
 	 */
-	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final Vector biases, final FloatApplier activationFunction) {
+	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final Vector biases, final DoubleApplier activationFunction) {
 		return weights.multiply(prevActivation).plus(biases).transform(activationFunction);
 	}
 	
@@ -35,14 +35,14 @@ public final class NetworkFunctions {
 	 * @param activationFunction activation function to squash the outputs
 	 * @return the output vector, <code>(weights * prevActivation)</code>
 	 */
-	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final FloatApplier activationFunction) {
+	public static final Vector computeOutputVector(final Matrix weights, final Vector prevActivation, final DoubleApplier activationFunction) {
 		return weights.multiply(prevActivation).transform(activationFunction);
 	}
 	
 	/**
 	 * The mean squared error function as a FloatOperator, multiplied by 1/2 to cancel the squared term when differentiating.
 	 */
-	private static final FloatOperator MSE = (ideal, actual) -> 0.5f * (ideal - actual) * (ideal - actual);
+	private static final DoubleOperator MSE = (ideal, actual) -> 0.5f * (ideal - actual) * (ideal - actual);
 	
 	/**
 	 * Computes the total mean squared error given an ideal vector and an actual vector. Both vectors must have the same dimension.

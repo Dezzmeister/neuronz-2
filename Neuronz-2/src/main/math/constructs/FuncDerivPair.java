@@ -1,6 +1,6 @@
 package main.math.constructs;
 
-import main.math.utility.FloatApplier;
+import main.math.utility.DoubleApplier;
 
 /**
  * Contains a function and its partial derivative with respect to the original function's input.
@@ -28,12 +28,12 @@ public final class FuncDerivPair {
 	/**
 	 * The activation function
 	 */
-	public final FloatApplier function;
+	public final DoubleApplier function;
 	
 	/**
 	 * The partial derivative of the function with respect to the original function's input
 	 */
-	public final FloatApplier partialDerivative;
+	public final DoubleApplier partialDerivative;
 	
 	/**
 	 * Creates a new FuncDerivPair with the given function and partial derivative.
@@ -41,7 +41,7 @@ public final class FuncDerivPair {
 	 * @param _function original function
 	 * @param _partialDerivative partial derivative of <code>_function</code>
 	 */
-	public FuncDerivPair(final FloatApplier _function, final FloatApplier _partialDerivative) {
+	public FuncDerivPair(final DoubleApplier _function, final DoubleApplier _partialDerivative) {
 		function = _function;
 		partialDerivative = _partialDerivative;
 	}

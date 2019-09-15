@@ -1,16 +1,23 @@
 package main.math.constructs;
 
+import java.io.Serializable;
+
 import main.math.utility.DimensionMismatchException;
-import main.math.utility.FloatApplier;
-import main.math.utility.FloatOperator;
+import main.math.utility.DoubleApplier;
+import main.math.utility.DoubleOperator;
 
 /**
  * A rank 3 tensor.
  *
  * @author Joe Desmond
  */
-public final class Tensor3 extends ElementContainer<Tensor3> {
+public final class Tensor3 extends ElementContainer<Tensor3> implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5804689492753369823L;
+
 	/**
 	 * Values of the tensor
 	 */
@@ -52,7 +59,7 @@ public final class Tensor3 extends ElementContainer<Tensor3> {
 	}
 
 	@Override
-	public Tensor3 elementOperation(final Tensor3 other, final FloatOperator operator) {
+	public Tensor3 elementOperation(final Tensor3 other, final DoubleOperator operator) {
 		if (dimension != other.dimension) {
 			throw new DimensionMismatchException("Tensors must have the same number of layers to perform element operations!");
 		}
@@ -67,7 +74,7 @@ public final class Tensor3 extends ElementContainer<Tensor3> {
 	}
 
 	@Override
-	public Tensor3 transform(final FloatApplier transformation) {
+	public Tensor3 transform(final DoubleApplier transformation) {
 		final Matrix[] result = new Matrix[dimension];
 		
 		for (int layer = 0; layer < dimension; layer++) {

@@ -6,7 +6,7 @@ package main.math.utility;
  * @author Joe Desmond
  */
 @FunctionalInterface
-public interface FloatOperator {
+public interface DoubleOperator {
 	
 	/**
 	 * Operates on <code>a</code> and <code>b</code>.

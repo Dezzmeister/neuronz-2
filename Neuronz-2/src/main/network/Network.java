@@ -1,12 +1,18 @@
 package main.network;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Random;
 
 import main.math.constructs.FuncDerivPair;
 import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
 import main.math.constructs.Vector;
-import main.math.utility.FloatOperator;
+import main.math.utility.DoubleOperator;
 import main.math.utility.Functions;
 
 /**
@@ -14,16 +20,16 @@ import main.math.utility.Functions;
  *
  * @author Joe Desmond
  */
-public final class Network {
+public final class Network implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4591608638507838712L;
+
 	/**
 	 * The weight relationships between each neuron, as well as biases which are stored in the last column of each matrix.
 	 */
 	public Tensor3 weightTensor;
-	
-	/**
-	 * The activation vectors for the latest run of the network.
-	 */
-	private final Vector[] activations;
 	
 	/**
 	 * The total number of neuron layers, including the input and output layers
@@ -57,8 +63,7 @@ public final class Network {
 		}
 		
 		weightTensor = new Tensor3(weightMatrices);
-		activations = new Vector[weightTensor.dimension + 1];
-		layers = activations.length;
+		layers = weightTensor.dimension + 1;
 	}
 	
 	/**
@@ -68,22 +73,22 @@ public final class Network {
 	 */
 	public Network(final Tensor3 _weightTensor) {
 		weightTensor = _weightTensor;
-		activations = new Vector[weightTensor.dimension + 1];
-		layers = activations.length;
+		layers = weightTensor.dimension + 1;
 	}
 	
 	/**
 	 * The partial derivative of the MSE with respect to the final output
 	 */
-	private static final FloatOperator MSE_DERIV = (actual, ideal) -> actual - ideal;
+	private static final DoubleOperator MSE_DERIV = (actual, ideal) -> actual - ideal;
 	
 	/**
-	 * Runs the network on the given inputs and returns the output.
+	 * Runs the network on the given inputs and returns the activations.
 	 * 
 	 * @param input first activation vector
 	 * @return output vector
 	 */
-	public final Vector run(final Vector input) {
+	public final Vector[] run(final Vector input) {
+		final Vector[] activations = new Vector[weightTensor.dimension + 1];
 		activations[0] = input;
 		
 		for (int i = 1; i < layers; i++) {
@@ -94,7 +99,7 @@ public final class Network {
 			}
 		}
 		
-		return activations[layers - 1];
+		return activations;
 	}
 	
 	/**
@@ -110,22 +115,22 @@ public final class Network {
 	/**
 	 * Get the latest output from the last run of this network.
 	 * 
+	 * @param activations activation vector from the latest run
 	 * @return the latest output
 	 */
-	public final Vector getLatestOutput() {
+	public final Vector getLatestOutput(final Vector[] activations) {
 		return activations[layers - 1];
 	}
 	
 	/**
-	 * Calculates and returns the weight gradients with MSE as the cost function.
+	 * Calculates and returns the weight gradients with MSE as the cost function. Uses matrix operations.
 	 * 
-	 * @param learningRate learning rate
 	 * @param input input vector (first activation vector)
 	 * @param ideal expected outputs
-	 * @return the weight deltas
+	 * @return the weight deltas and activations
 	 */
-	public final Tensor3 backprop(final double learningRate, final Vector input, final Vector ideal) {		
-		run(input);
+	public final BackpropPair backprop(final Vector input, final Vector ideal) {		
+		final Vector[] activations = run(input);
 		
 		final Matrix[] weightDeltaTensor = new Matrix[weightTensor.dimension]; 
 		
@@ -153,6 +158,65 @@ public final class Network {
 			}
 		}
 		
-		return new Tensor3(weightDeltaTensor);
+		return new BackpropPair(new Tensor3(weightDeltaTensor), activations);
+	}
+	
+	/**
+	 * Saves this network to a file so that it can be run/trained later.
+	 * 
+	 * @param path path to file (will be created if it doesn't exist)
+	 * @throws IOException if there is a problem creating the {@link FileOutputStream} or {@link ObjectOutputStream}
+	 */
+	public final void saveAs(final String path) throws IOException {
+		final FileOutputStream fos = new FileOutputStream(path);
+		final ObjectOutputStream oos = new ObjectOutputStream(fos);
+		
+		oos.writeObject(this);
+		oos.close();
+	}
+	
+	/**
+	 * Loads a network from a file. Networks can be saved to a file by {@link Network#saveAs}.
+	 * 
+	 * @param path path to network file
+	 * @return a network loaded from <code>path</code>
+	 * @throws IOException if there is a problem creating the {@link FileInputStream} or {@link ObjectInputStream}
+	 * @throws ClassNotFoundException if the file at <code>path</code> does not contain a {@link Network}
+	 */
+	public static final Network loadFrom(final String path) throws IOException, ClassNotFoundException {
+		final FileInputStream fis = new FileInputStream(path);
+		final ObjectInputStream ois = new ObjectInputStream(fis);
+		final Network network = (Network) ois.readObject();
+		
+		ois.close();
+		return network;
+	}
+	
+	/**
+	 * The result of one forward pass and one backward pass through the network, contains weight deltas and the activations for each layer.
+	 *
+	 * @author Joe Desmond
+	 */
+	public static final class BackpropPair {
+		/**
+		 * Weight gradient
+		 */
+		public final Tensor3 weightDeltas;
+		
+		/**
+		 * Activations for each layer
+		 */
+		public final Vector[] activations;
+		
+		/**
+		 * Creates a BackpropPair representing the result of one forward and backward pass through the network.
+		 * 
+		 * @param _weightDeltas weight gradient from backward pass
+		 * @param _activations activations from forward pass
+		 */
+		public BackpropPair(final Tensor3 _weightDeltas, final Vector[] _activations) {
+			weightDeltas = _weightDeltas;
+			activations = _activations;
+		}
 	}
 }

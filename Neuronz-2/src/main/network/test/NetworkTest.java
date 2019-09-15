@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 
@@ -20,8 +21,12 @@ import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
 import main.math.constructs.Vector;
 import main.math.utility.Functions;
+import main.math.utility.OutputVerificationScheme;
+import main.network.LearningRateAdjuster;
 import main.network.Network;
+import main.network.Network.BackpropPair;
 import main.network.NetworkFunctions;
+import main.network.NetworkRunner;
 
 /**
  * Contains functions for testing neural networks.
@@ -36,7 +41,7 @@ public final class NetworkTest {
 		//networkClassTest();
 		//networkClassTest2();
 		//mnistTest();
-		mnistTest2();
+		mnistTest3();
 	}
 	
 	private static final void saveImage(final Vector pixels, final String name) {
@@ -59,6 +64,78 @@ public final class NetworkTest {
 			ImageIO.write(image, "png", new File(name));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private static final void mnistTest3() {
+		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
+		
+		for (int i = 0; i < inputImages.length; i++) {
+			inputImages[i] = inputImages[i].append(1); //Append 1 for biases
+		}
+		
+		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
+		final Vector[] idealOutputs = new Vector[inputImages.length];
+		
+		for (int i = 0; i < expectedDigits.length; i++) {
+			final double[] values = new double[10];
+			values[expectedDigits[i]] = 1;
+			idealOutputs[i] = new Vector(values);
+		}
+		
+		final ImageLabelPair[] data = new ImageLabelPair[50000];
+		
+		for (int i = 0; i < data.length; i++) {
+			data[i] = new ImageLabelPair(inputImages[i], idealOutputs[i]);
+		}
+		
+		final Vector[] testImages = MnistLoader.loadImages("data/mnist/test-images.idx3-ubyte");
+		
+		for (int i = 0; i < testImages.length; i++) {
+			testImages[i] = testImages[i].append(1);
+		}
+		
+		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
+		final Vector[] idealTestOutputs = new Vector[testImages.length];
+		
+		for (int i = 0; i < testDigits.length; i++) {
+			final double[] values = new double[10];
+			values[testDigits[i]] = 1;
+			idealTestOutputs[i] = new Vector(values);
+		}
+		
+		final Network network = new Network(784, 100, 50, 10);
+		
+		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
+			if (success <= 0.85) {
+				return 1.9;
+			} else {
+				return 1.0;
+			}
+		};
+		
+		final OutputVerificationScheme evaluator = (actual, ideal) -> {
+			int greatestIndex = 0;
+			double greatestValue = 0;
+			for (int i = 0; i < 10; i++) {
+				double currentValue = actual.get(i);
+				
+				if (currentValue > greatestValue) {
+					greatestValue = currentValue;
+					greatestIndex = i;
+				}
+			}
+			
+			return ideal.get(greatestIndex) == 1;
+		};
+		
+		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
+		try {
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-slow.ntwk2");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
 	}
@@ -93,9 +170,9 @@ public final class NetworkTest {
 		
 		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
 		
-		final Network network = new Network(784, 100, 10);
+		final Network network = new Network(784, 100, 40, 10);
 		
-		final double learningRate = 1.5f;
+		double learningRate = 1.9f;
 		final int miniBatchSize = 10;
 		final int epochs = 30;
 		
@@ -104,7 +181,8 @@ public final class NetworkTest {
 			
 			Tensor3 weightDeltas = network.weightTensor.minus(network.weightTensor);
 			for (int j = 0; j < 50000 - miniBatchSize; j++) {
-				Tensor3 deltas = network.backprop(learningRate, data[j].image, data[j].digit);
+				final BackpropPair result = network.backprop(data[j].image, data[j].digit);
+				Tensor3 deltas = result.weightDeltas;
 				weightDeltas = weightDeltas.plus(deltas);
 				
 				if (j != 0 && j % miniBatchSize == 0) {
@@ -116,7 +194,7 @@ public final class NetworkTest {
 			
 			int successes = 0;
 			for (int j = 0; j < 10000; j++) {
-				final Vector output = network.run(testImages[j]);
+				final Vector output = network.getLatestOutput(network.run(testImages[j]));
 				
 				int highestDigit = 0;
 				for (int k = 0; k < 10; k++) {
@@ -130,7 +208,10 @@ public final class NetworkTest {
 				}
 			}
 			
-			System.out.println("Epoch " + i + ": " + successes + "/10000   " + ((100.0f * successes)/10000.0f));
+			System.out.println("Epoch " + i + ": " + successes + "/10000   " + ((100.0f * successes)/10000.0f) + "%");
+			if (successes >= 8600) {
+				learningRate = 1.1f;
+			} 
 		}
 	}
 	
@@ -141,77 +222,6 @@ public final class NetworkTest {
 		ImageLabelPair(final Vector _image, final Vector _digit) {
 			image = _image;
 			digit = _digit;
-		}
-	}
-	
-	private static final void mnistTest() {
-		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");		
-		
-		for (int i = 0; i < inputImages.length; i++) {
-			inputImages[i] = inputImages[i].append(1); //Append 1 for biases
-		}
-		
-		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
-		final Vector[] idealOutputs = new Vector[inputImages.length];
-		
-		for (int i = 0; i < expectedDigits.length; i++) {
-			final double[] values = new double[10];
-			values[expectedDigits[i]] = 1;
-			idealOutputs[i] = new Vector(values);
-		}
-		
-		final Network network = new Network(784, 100, 10);
-		final Tensor3 initialWeightTensor = network.weightTensor.transform(w -> w);
-		final double learningRate = 3.0f;
-		
-		int batchSuccesses = 0;
-		final int batchSize = 50;
-		final int kMax = 20;
-		
-		Tensor3 weightDeltas = network.weightTensor.minus(network.weightTensor);
-		for (int i = 0; i < inputImages.length; i++) {
-			
-			int expectedDigit = expectedDigits[i];
-			for (int k = 0; k < kMax; k++) {
-				final Tensor3 deltas = network.backprop(learningRate, inputImages[i], idealOutputs[i]);
-				weightDeltas = weightDeltas.plus(deltas);
-				
-				final Vector output = network.getLatestOutput();
-				
-				int highestDigit = 0;
-				for (int j = 0; j < output.length; j++) {
-					if (output.get(j) > output.get(highestDigit)) {
-						highestDigit = j;
-					}
-				}
-				
-				if (highestDigit == expectedDigit) {
-					batchSuccesses++;
-				}
-			}
-			
-			if (i != 0 && i % batchSize == 0) {
-				System.out.println(batchSuccesses + " successes in " + (batchSize * kMax) + " runs: " + (100.0f * batchSuccesses/(double)(batchSize * kMax)) + "%");
-				batchSuccesses = 0;
-				weightDeltas.transform(w -> w / (float)(kMax * batchSize));
-				network.applyWeightDeltas(weightDeltas, learningRate);
-			}
-		}
-	}
-	
-	private static final void networkClassTest2() {
-		final Network network = new Network(3, 10, 4, 3);
-		
-		final Vector input = new Vector(0.69f, 0.5f, 0.8f, 1.0f);
-		final Vector ideal = new Vector(0.5f, 0.15f, 0.75f);
-		final double eta = 0.5f;
-		
-		for (int i = 0; i < 10000; i++) {
-			final Tensor3 deltas = network.backprop(eta, input, ideal);
-			final Vector output = network.getLatestOutput();
-			network.applyWeightDeltas(deltas, eta);
-			
-			if (i % 100 == 0) System.out.println(output);
 		}
 	}
 	
@@ -234,8 +244,9 @@ public final class NetworkTest {
 		final double eta = 0.5f;
 		
 		for (int i = 0; i < 1000000; i++) {
-			final Tensor3 deltas = network.backprop(eta, input, ideal);
-			final Vector output = network.getLatestOutput();
+			final BackpropPair result = network.backprop(input, ideal);
+			final Tensor3 deltas = result.weightDeltas;
+			final Vector output = network.getLatestOutput(result.activations);
 			network.applyWeightDeltas(deltas, eta);
 			
 			if (i % 100000 == 0) System.out.println(output);
