@@ -110,8 +110,10 @@ public final class NetworkTest {
 		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
 			if (success <= 0.85) {
 				return 1.9;
-			} else {
+			} else if (success <= 0.9) {
 				return 1.0;
+			} else {
+				return 0.75;
 			}
 		};
 		
@@ -132,7 +134,7 @@ public final class NetworkTest {
 		
 		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
 		try {
-			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-slow.ntwk2");
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-test-trained.ntwk2");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {

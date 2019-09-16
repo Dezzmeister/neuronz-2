@@ -12,8 +12,8 @@ import main.math.constructs.FuncDerivPair;
 import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
 import main.math.constructs.Vector;
+import main.math.utility.DoubleApplier;
 import main.math.utility.DoubleOperator;
-import main.math.utility.Functions;
 
 /**
  * A neural network. The weights and biases of the network are represented as a rank 3 tensor.
@@ -32,12 +32,23 @@ public final class Network implements Serializable {
 	public Tensor3 weightTensor;
 	
 	/**
+	 * Derivative of the cost function to use for backpropagation
+	 */
+	private final DoubleOperator costFunctionDerivative;
+	
+	/**
+	 * Activation functions for each layer, except the output layer
+	 */
+	private final FuncDerivPair[] activationFunctions;
+	
+	/**
 	 * The total number of neuron layers, including the input and output layers
 	 */
 	private final int layers;
 	
 	/**
-	 * Creates a neural network with the specified layer sizes. The weights and biases are initialized to random Standard Normal values.
+	 * Creates a neural network with the specified layer sizes. The weights and biases are initialized to random Standard Normal values. A network created with this
+	 * constructor will use the sigmoid activation function for each layer and MSE as the cost function. To change these functions, use {@link Network#Network(int[], FuncDerivPair[], DoubleOperator)}.
 	 * 
 	 * @param layerSizes number of neurons in each layer, starting with the input layer and ending with the output layer, with any number of hidden layers in between
 	 */
@@ -55,7 +66,6 @@ public final class Network implements Serializable {
 			for (int row = 0; row < weights.length; row++) {
 				for (int col = 0; col < weights[0].length; col++) {
 					weights[row][col] = (double) random.nextGaussian();
-					//weights[row][col] = (double) Math.random();
 				}
 			}
 			
@@ -64,6 +74,47 @@ public final class Network implements Serializable {
 		
 		weightTensor = new Tensor3(weightMatrices);
 		layers = weightTensor.dimension + 1;
+		
+		activationFunctions = new FuncDerivPair[layers - 1];
+		for (int i = 0; i < layers - 1; i++) {
+			activationFunctions[i] = FuncDerivPair.SIGMOID;
+		}
+		
+		costFunctionDerivative = MSE_DERIV;
+	}
+	
+	/**
+	 * Same as {@link Network#Network(Tensor3)}, except the cost function can be set and activation functions can be set for each layer (except output).
+	 * 
+	 * @param layerSizes number of neurons in each layer, including input and output layers
+	 * @param _activationFunctions activation functions for each layer (except output layer)
+	 * @param _costFunctionDerivative derivative of the cost function to use for backpropagation
+	 */
+	public Network(final int[] layerSizes, final FuncDerivPair[] _activationFunctions, final DoubleOperator _costFunctionDerivative) {
+		if (layerSizes.length < 2) {
+			throw new IllegalArgumentException("Neural network must have 2 or more layers!");
+		}
+		
+		final Matrix[] weightMatrices = new Matrix[layerSizes.length - 1];
+		
+		final Random random = new Random();
+		for (int layer = 0; layer < layerSizes.length - 1; layer++) {
+			double[][] weights = new double[layerSizes[layer + 1]][layerSizes[layer] + 1]; //layerSizes[layer] + 1 to include a column for biases
+			
+			for (int row = 0; row < weights.length; row++) {
+				for (int col = 0; col < weights[0].length; col++) {
+					weights[row][col] = (double) random.nextGaussian();
+				}
+			}
+			
+			weightMatrices[layer] = new Matrix(weights);
+		}
+		
+		weightTensor = new Tensor3(weightMatrices);
+		layers = weightTensor.dimension + 1;
+		
+		activationFunctions = _activationFunctions;
+		costFunctionDerivative = _costFunctionDerivative;
 	}
 	
 	/**
@@ -74,7 +125,16 @@ public final class Network implements Serializable {
 	public Network(final Tensor3 _weightTensor) {
 		weightTensor = _weightTensor;
 		layers = weightTensor.dimension + 1;
+		
+		activationFunctions = new FuncDerivPair[layers - 1];
+		for (int i = 0; i < layers - 1; i++) {
+			activationFunctions[i] = FuncDerivPair.SIGMOID;
+		}
+		
+		costFunctionDerivative = MSE_DERIV;
 	}
+	
+	
 	
 	/**
 	 * The partial derivative of the MSE with respect to the final output
@@ -92,10 +152,12 @@ public final class Network implements Serializable {
 		activations[0] = input;
 		
 		for (int i = 1; i < layers; i++) {
+			final DoubleApplier activationFunction = activationFunctions[layers - 1].function;
+			
 			if (i == layers - 1) {
-				activations[i] = NetworkFunctions.computeOutputVector(weightTensor.getLayer(i - 1), activations[i - 1], Functions::sigmoid);
+				activations[i] = NetworkFunctions.computeOutputVector(weightTensor.getLayer(i - 1), activations[i - 1], activationFunction);
 			} else {
-				activations[i] = NetworkFunctions.computeOutputVector(weightTensor.getLayer(i - 1), activations[i - 1], Functions::sigmoid).append(1);
+				activations[i] = NetworkFunctions.computeOutputVector(weightTensor.getLayer(i - 1), activations[i - 1], activationFunction).append(1);
 			}
 		}
 		
@@ -134,11 +196,13 @@ public final class Network implements Serializable {
 		
 		final Matrix[] weightDeltaTensor = new Matrix[weightTensor.dimension]; 
 		
-		Vector errorOutputDeriv = activations[layers - 1].elementOperation(ideal, MSE_DERIV);
+		Vector errorOutputDeriv = activations[layers - 1].elementOperation(ideal, costFunctionDerivative);
 		
 		for (int i = layers - 1; i >= 1; i--) {
-			final Vector sigmoidDeriv = activations[i].transform(FuncDerivPair.SIGMOID.partialDerivative);
-			final Vector errorInputDeriv = errorOutputDeriv.hadamard(sigmoidDeriv);
+			final DoubleApplier activationFuncDeriv = activationFunctions[i - 1].partialDerivative;
+			
+			final Vector activationRawInputDeriv = activations[i].transform(activationFuncDeriv);
+			final Vector errorInputDeriv = errorOutputDeriv.hadamard(activationRawInputDeriv);
 			final Matrix weightDeltas;
 			
 			if (i == layers - 1) {
