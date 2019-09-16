@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import javax.imageio.ImageIO;
 
 import main.dataio.MnistLoader;
+import main.math.constructs.FuncDerivPair;
 import main.math.constructs.Matrix;
 import main.math.constructs.Tensor3;
 import main.math.constructs.Vector;
@@ -27,6 +28,7 @@ import main.network.Network;
 import main.network.Network.BackpropPair;
 import main.network.NetworkFunctions;
 import main.network.NetworkRunner;
+import main.network.ProcessingScheme;
 
 /**
  * Contains functions for testing neural networks.
@@ -36,7 +38,7 @@ import main.network.NetworkRunner;
 @SuppressWarnings("unused")
 public final class NetworkTest {
 	
-	public static final void main(final String[] args) {
+	public static final void main(final String[] args) throws ClassNotFoundException, IOException {
 		//manualTest();
 		//networkClassTest();
 		//networkClassTest2();
@@ -68,7 +70,7 @@ public final class NetworkTest {
 		}
 	}
 	
-	private static final void mnistTest3() {
+	private static final void mnistTest3() throws ClassNotFoundException, IOException {
 		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
 		
 		for (int i = 0; i < inputImages.length; i++) {
@@ -105,8 +107,10 @@ public final class NetworkTest {
 			idealTestOutputs[i] = new Vector(values);
 		}
 		
-		final Network network = new Network(784, 100, 50, 10);
+		final Network network = new Network(new int[] {784, 100, 50, 10}, new FuncDerivPair[] {FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID}, Network.MSE_DERIV);
+		//final Network network = Network.loadFrom("networks/mnist/network-100h-50h-93percent.ntwk2");
 		
+		/*
 		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
 			if (success <= 0.85) {
 				return 1.9;
@@ -114,6 +118,17 @@ public final class NetworkTest {
 				return 1.0;
 			} else {
 				return 0.75;
+			}
+		};
+		*/
+		
+		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
+			if (success <= 0.85) {
+				return 1.9;
+			} else if (success <= 0.9) {
+				return 1.0;
+			} else {
+				return 0.55;
 			}
 		};
 		
@@ -134,7 +149,7 @@ public final class NetworkTest {
 		
 		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
 		try {
-			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-test-trained.ntwk2");
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-2.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {

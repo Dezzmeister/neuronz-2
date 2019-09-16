@@ -139,7 +139,7 @@ public final class Network implements Serializable {
 	/**
 	 * The partial derivative of the MSE with respect to the final output
 	 */
-	private static final DoubleOperator MSE_DERIV = (actual, ideal) -> actual - ideal;
+	public static final DoubleOperator MSE_DERIV = (actual, ideal) -> actual - ideal;
 	
 	/**
 	 * Runs the network on the given inputs and returns the activations.
@@ -152,7 +152,7 @@ public final class Network implements Serializable {
 		activations[0] = input;
 		
 		for (int i = 1; i < layers; i++) {
-			final DoubleApplier activationFunction = activationFunctions[layers - 1].function;
+			final DoubleApplier activationFunction = activationFunctions[i - 1].function;
 			
 			if (i == layers - 1) {
 				activations[i] = NetworkFunctions.computeOutputVector(weightTensor.getLayer(i - 1), activations[i - 1], activationFunction);

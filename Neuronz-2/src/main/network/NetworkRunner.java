@@ -68,11 +68,12 @@ public final class NetworkRunner {
 	 * @param learningRateSchedule determines the learning rate after each epoch
 	 * @param successEvaluator determines if a forward pass through the network produced the expected vector (or something that is close enough to the expected vector)
 	 * @param bestNetworkFileName name of file to save best network as, or null if the network should not be saved
+	 * @param processingScheme what should be used to train the network
 	 * @throws ExecutionException if there is a problem performing a pass through the network
 	 * @throws InterruptedException if something stops one of the threads used to train the network 
 	 */
-	public final void run(final int epochs, final int miniBatchSize, final LearningRateAdjuster learningRateSchedule, final OutputVerificationScheme successEvaluator, final String bestNetworkFileName) throws InterruptedException, ExecutionException {
-		final ExecutorService threadPool = Executors.newFixedThreadPool(miniBatchSize);
+	public final void run(final int epochs, final int miniBatchSize, final LearningRateAdjuster learningRateSchedule, final OutputVerificationScheme successEvaluator, final String bestNetworkFileName, final ProcessingScheme processingScheme) throws InterruptedException, ExecutionException {
+		final ExecutorService threadPool = (processingScheme == ProcessingScheme.CPU_MULTITHREADED) ? Executors.newFixedThreadPool(miniBatchSize) : null;
 		
 		double highestSuccessRate = 0;
 		double learningRate = learningRateSchedule.getNewLearningRate(0, 0, 0);
@@ -85,17 +86,30 @@ public final class NetworkRunner {
 			Tensor3 weightDeltas = network.weightTensor.transform(w -> 0);
 			
 			for (int j = 0; j < trainingData.length; j += miniBatchSize) {
-				@SuppressWarnings("unchecked")
-				final Future<Tensor3>[] miniBatchResults = (Future<Tensor3>[]) new Future<?>[miniBatchSize];
-				for (int k = 0; k < miniBatchSize; k++) {
-					final NetworkPass networkPass = new NetworkPass(network, trainingData[k + j].input, trainingData[k + j].output);
-					final Future<Tensor3> future = threadPool.submit(networkPass);
-					miniBatchResults[k] = future;
-				}
 				
-				for (int k = 0; k < miniBatchSize; k++) {
-					final Tensor3 gradients = miniBatchResults[k].get();
-					weightDeltas = weightDeltas.plus(gradients);
+				switch (processingScheme) {
+					case CPU_MULTITHREADED:
+						@SuppressWarnings("unchecked")
+						final Future<Tensor3>[] miniBatchResults = (Future<Tensor3>[]) new Future<?>[miniBatchSize];
+						for (int k = 0; k < miniBatchSize; k++) {
+							final NetworkPass networkPass = new NetworkPass(network, trainingData[k + j].input, trainingData[k + j].output);
+							final Future<Tensor3> future = threadPool.submit(networkPass);
+							miniBatchResults[k] = future;
+						}
+						
+						for (int k = 0; k < miniBatchSize; k++) {
+							final Tensor3 gradients = miniBatchResults[k].get();
+							weightDeltas = weightDeltas.plus(gradients);
+						}
+						break;
+					case CPU_SINGLE_THREAD:
+						for (int k = 0; k < miniBatchSize; k++) {
+							final Tensor3 weightGradient = network.backprop(trainingData[k + j].input, trainingData[k + j].output).weightDeltas;
+							weightDeltas = weightDeltas.plus(weightGradient);
+						}
+						break;
+					case GPU:
+						break;
 				}
 				
 				weightDeltas = weightDeltas.transform(w -> w / (double)miniBatchSize);

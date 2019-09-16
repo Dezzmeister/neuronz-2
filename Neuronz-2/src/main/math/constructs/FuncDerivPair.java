@@ -1,5 +1,7 @@
 package main.math.constructs;
 
+import java.io.Serializable;
+
 import main.math.utility.DoubleApplier;
 
 /**
@@ -7,8 +9,13 @@ import main.math.utility.DoubleApplier;
  *
  * @author Joe Desmond
  */
-public final class FuncDerivPair {
+public final class FuncDerivPair implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8265927003886644864L;
+
 	/**
 	 * The sigmoid activation function
 	 */

@@ -1,12 +1,14 @@
 package main.math.utility;
 
+import java.io.Serializable;
+
 /**
  * Represents a function that takes one double and returns a double result.
  *
  * @author Joe Desmond
  */
 @FunctionalInterface
-public interface DoubleApplier {
+public interface DoubleApplier extends Serializable {
 	
 	/**
 	 * Applies an operation to a double.
