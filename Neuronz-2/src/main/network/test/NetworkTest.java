@@ -44,6 +44,32 @@ public final class NetworkTest {
 		//networkClassTest2();
 		//mnistTest();
 		mnistTest3();
+		//digitTest();
+	}
+	
+	private static final void digitTest() throws ClassNotFoundException, IOException {
+		final Network network = Network.loadFrom("networks/mnist/network-100h-50h-2-3.ntwk2");
+		final BufferedImage img = ImageIO.read(new File("digit.png"));
+		final double[] pixels = new double[784];
+		for (int y = 0; y < 28; y++) {
+			for (int x = 0; x < 28; x++) {
+				final int color = img.getRGB(x, y) & 0xFF;
+				pixels[x + 28 * y] = (color < 127) ? 1.5 : -1.5;
+			}
+		}
+		
+		final Vector input = new Vector(pixels).append(1);
+		final Vector[] outputs = network.run(input);
+		final Vector output = network.getLatestOutput(outputs);
+		
+		int highestIndex = 0;
+		for (int i = 0; i < 10; i++) {
+			if (output.get(i) > output.get(highestIndex)) {
+				highestIndex = i;
+			}
+		}
+		System.out.println(highestIndex);
+		System.out.println(output);
 	}
 	
 	private static final void saveImage(final Vector pixels, final String name) {
@@ -107,8 +133,9 @@ public final class NetworkTest {
 			idealTestOutputs[i] = new Vector(values);
 		}
 		
-		final Network network = new Network(new int[] {784, 100, 50, 10}, new FuncDerivPair[] {FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID}, Network.MSE_DERIV);
+		//final Network network = new Network(new int[] {784, 100, 50, 10}, new FuncDerivPair[] {FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID}, Network.MSE_DERIV);
 		//final Network network = Network.loadFrom("networks/mnist/network-100h-50h-93percent.ntwk2");
+		final Network network = Network.loadFrom("networks/mnist/network-100h-50h-2-3.ntwk2");
 		
 		/*
 		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
@@ -127,8 +154,10 @@ public final class NetworkTest {
 				return 1.9;
 			} else if (success <= 0.9) {
 				return 1.0;
+			} else if (success <= 0.93) {
+				return 0.4;
 			} else {
-				return 0.55;
+				return 0.3;
 			}
 		};
 		
@@ -149,7 +178,7 @@ public final class NetworkTest {
 		
 		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
 		try {
-			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-2.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-2-4.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
