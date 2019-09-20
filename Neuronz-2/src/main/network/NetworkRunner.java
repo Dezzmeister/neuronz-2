@@ -79,6 +79,8 @@ public final class NetworkRunner {
 		double learningRate = learningRateSchedule.getNewLearningRate(0, 0, 0);
 		
 		for (int epoch = 0; epoch < epochs; epoch++) {
+			System.out.println("Epoch " + epoch + ":");
+			System.out.println("\tLearning Rate: " + learningRate);
 			long time = System.currentTimeMillis();
 			double previousSuccessRate = 0;
 			Collections.shuffle(Arrays.asList(trainingData));
@@ -150,8 +152,8 @@ public final class NetworkRunner {
 				}
 			}
 			double timeInSeconds = (System.currentTimeMillis() - time) / (double)1000;
-			System.out.println("Epoch " + epoch + ": Success rate: " + (100.0 * previousSuccessRate) + "%");
-			System.out.println("Completed in " + timeInSeconds + " seconds");
+			System.out.println("\tSuccess rate: " + (100.0 * previousSuccessRate) + "%");
+			System.out.println("\tCompleted in " + timeInSeconds + " seconds");
 		}
 		
 		threadPool.shutdown();

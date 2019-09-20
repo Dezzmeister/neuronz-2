@@ -133,21 +133,10 @@ public final class NetworkTest {
 			idealTestOutputs[i] = new Vector(values);
 		}
 		
-		//final Network network = new Network(new int[] {784, 100, 50, 10}, new FuncDerivPair[] {FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID}, Network.MSE_DERIV);
+		final Network network = new Network(new int[] {784, 100, 50, 10}, new FuncDerivPair[] {FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID, FuncDerivPair.SIGMOID}, Network.MSE_DERIV);
+		System.out.println("Creating a deep neural network with 784 input neurons, 100 hidden neurons in the first hidden layer, 50 hidden neurons in the second hidden layer, and 10 output neurons; using sigmoid for all layers and MSE as the cost function.");
 		//final Network network = Network.loadFrom("networks/mnist/network-100h-50h-93percent.ntwk2");
-		final Network network = Network.loadFrom("networks/mnist/network-100h-50h-2-3.ntwk2");
-		
-		/*
-		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
-			if (success <= 0.85) {
-				return 1.9;
-			} else if (success <= 0.9) {
-				return 1.0;
-			} else {
-				return 0.75;
-			}
-		};
-		*/
+		//final Network network = Network.loadFrom("networks/mnist/network-100h-50h-2-3.ntwk2");
 		
 		final LearningRateAdjuster learningRateSchedule = (lr, epoch, success) -> {
 			if (success <= 0.85) {
@@ -178,7 +167,7 @@ public final class NetworkTest {
 		
 		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
 		try {
-			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-2-4.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-alt.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
