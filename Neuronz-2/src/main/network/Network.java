@@ -149,7 +149,7 @@ public final class Network implements Serializable {
 	 */
 	public final Vector[] run(final Vector input) {
 		final Vector[] activations = new Vector[weightTensor.dimension + 1];
-		activations[0] = input;
+		activations[0] = input.append(1);
 		
 		for (int i = 1; i < layers; i++) {
 			final DoubleApplier activationFunction = activationFunctions[i - 1].function;
@@ -185,7 +185,7 @@ public final class Network implements Serializable {
 	}
 	
 	/**
-	 * Calculates and returns the weight gradients with MSE as the cost function. Uses matrix operations.
+	 * Calculates and returns the weight gradients. Uses matrix operations instead of explicit loops.
 	 * 
 	 * @param input input vector (first activation vector)
 	 * @param ideal expected outputs
@@ -199,7 +199,7 @@ public final class Network implements Serializable {
 		Vector errorOutputDeriv = activations[layers - 1].elementOperation(ideal, costFunctionDerivative);
 		
 		for (int i = layers - 1; i >= 1; i--) {
-			final DoubleApplier activationFuncDeriv = activationFunctions[i - 1].partialDerivative;
+			final DoubleApplier activationFuncDeriv = activationFunctions[i - 1].derivative;
 			
 			final Vector activationRawInputDeriv = activations[i].transform(activationFuncDeriv);
 			final Vector errorInputDeriv = errorOutputDeriv.hadamard(activationRawInputDeriv);

@@ -110,6 +110,8 @@ public final class NetworkRunner {
 						break;
 					case GPU:
 						break;
+					case FPGA:
+						break;
 				}
 				
 				weightDeltas = weightDeltas.transform(w -> w / (double)miniBatchSize);

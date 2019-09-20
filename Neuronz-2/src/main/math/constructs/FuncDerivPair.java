@@ -5,7 +5,7 @@ import java.io.Serializable;
 import main.math.utility.DoubleApplier;
 
 /**
- * Contains a function and its partial derivative with respect to the original function's input.
+ * Contains a function and its derivative with respect to the original function's input.
  *
  * @author Joe Desmond
  */
@@ -38,18 +38,18 @@ public final class FuncDerivPair implements Serializable {
 	public final DoubleApplier function;
 	
 	/**
-	 * The partial derivative of the function with respect to the original function's input
+	 * The derivative of the function with respect to the original function's input
 	 */
-	public final DoubleApplier partialDerivative;
+	public final DoubleApplier derivative;
 	
 	/**
-	 * Creates a new FuncDerivPair with the given function and partial derivative.
+	 * Creates a new FuncDerivPair with the given function and derivative.
 	 * 
 	 * @param _function original function
-	 * @param _partialDerivative partial derivative of <code>_function</code>
+	 * @param _derivative derivative of <code>_function</code>, the output of <code>function</code> for a given input is the input to this function
 	 */
-	public FuncDerivPair(final DoubleApplier _function, final DoubleApplier _partialDerivative) {
+	public FuncDerivPair(final DoubleApplier _function, final DoubleApplier _derivative) {
 		function = _function;
-		partialDerivative = _partialDerivative;
+		derivative = _derivative;
 	}
 }

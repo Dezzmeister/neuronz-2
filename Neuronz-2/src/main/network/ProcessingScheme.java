@@ -18,7 +18,14 @@ public enum ProcessingScheme {
 	CPU_MULTITHREADED,
 	
 	/**
-	 * Use the graphics card
+	 * Use the graphics card (NOT IMPLEMENTED)
 	 */
-	GPU
+	//TODO: Implement this
+	GPU,
+	
+	/**
+	 * Use an FPGA (NOT IMPLEMENTED)
+	 */
+	//TODO: A lot of work
+	FPGA
 }

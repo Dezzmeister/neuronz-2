@@ -58,7 +58,7 @@ public final class NetworkTest {
 			}
 		}
 		
-		final Vector input = new Vector(pixels).append(1);
+		final Vector input = new Vector(pixels);
 		final Vector[] outputs = network.run(input);
 		final Vector output = network.getLatestOutput(outputs);
 		
@@ -100,7 +100,7 @@ public final class NetworkTest {
 		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
 		
 		for (int i = 0; i < inputImages.length; i++) {
-			inputImages[i] = inputImages[i].append(1); //Append 1 for biases
+			inputImages[i] = inputImages[i];
 		}
 		
 		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
@@ -121,7 +121,7 @@ public final class NetworkTest {
 		final Vector[] testImages = MnistLoader.loadImages("data/mnist/test-images.idx3-ubyte");
 		
 		for (int i = 0; i < testImages.length; i++) {
-			testImages[i] = testImages[i].append(1);
+			testImages[i] = testImages[i];
 		}
 		
 		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
@@ -190,7 +190,7 @@ public final class NetworkTest {
 		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
 		
 		for (int i = 0; i < inputImages.length; i++) {
-			inputImages[i] = inputImages[i].append(1); //Append 1 for biases
+			inputImages[i] = inputImages[i];
 		}
 		
 		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
@@ -211,7 +211,7 @@ public final class NetworkTest {
 		final Vector[] testImages = MnistLoader.loadImages("data/mnist/test-images.idx3-ubyte");
 		
 		for (int i = 0; i < testImages.length; i++) {
-			testImages[i] = testImages[i].append(1);
+			testImages[i] = testImages[i];
 		}
 		
 		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
