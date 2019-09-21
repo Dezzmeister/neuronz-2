@@ -167,7 +167,7 @@ public final class NetworkTest {
 		
 		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
 		try {
-			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-alt.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-alt-2.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
