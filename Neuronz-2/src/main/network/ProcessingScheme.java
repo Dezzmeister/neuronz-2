@@ -25,6 +25,7 @@ public enum ProcessingScheme {
 	
 	/**
 	 * Use an FPGA (NOT IMPLEMENTED)
+	 * In progress: {@link https://github.com/Dezzmeister/vector-multiplier}
 	 */
 	//TODO: A lot of work
 	FPGA
