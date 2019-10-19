@@ -206,7 +206,7 @@ public final class Network implements Serializable {
 			final Matrix weightDeltas;
 			
 			if (i == layers - 1) {
-				weightDeltas = errorInputDeriv.outerProduct(activations[i - 1]);
+				weightDeltas = errorInputDeriv.outerProduct(activations[i - 1]);	//Rank 2 Tensor!
 			} else {
 				weightDeltas = errorInputDeriv.removeLastElement().outerProduct(activations[i - 1]);
 			}
