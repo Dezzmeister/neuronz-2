@@ -88,7 +88,7 @@ public final class Network implements Serializable {
 	 * 
 	 * @param layerSizes number of neurons in each layer, including input and output layers
 	 * @param _activationFunctions activation functions for each layer (except output layer)
-	 * @param _costFunctionDerivative derivative of the cost function to use for backpropagation
+	 * @param _costFunctionDerivative derivative of the cost function to use for backpropagation: first operand is the actual output, second is the ideal output
 	 */
 	public Network(final int[] layerSizes, final FuncDerivPair[] _activationFunctions, final DoubleOperator _costFunctionDerivative) {
 		if (layerSizes.length < 2) {
