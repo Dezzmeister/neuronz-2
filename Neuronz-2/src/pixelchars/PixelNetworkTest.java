@@ -9,12 +9,14 @@ import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 
-import main.math.constructs.Vector;
-import main.math.utility.OutputVerificationScheme;
-import main.network.LearningRateAdjuster;
-import main.network.Network;
-import main.network.NetworkRunner;
-import main.network.ProcessingScheme;
+import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.utility.OutputVerificationScheme;
+import dezzy.neuronz2.network.LearningRateAdjuster;
+import dezzy.neuronz2.network.Network;
+import dezzy.neuronz2.network.NetworkRunner;
+import dezzy.neuronz2.network.ProcessingScheme;
+
+
 
 /**
  * Tests a network that classifies a 5x5 image containing a capital letter of the alphabet.

@@ -16,19 +16,20 @@ import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 
-import main.dataio.MnistLoader;
-import main.math.constructs.FuncDerivPair;
-import main.math.constructs.Matrix;
-import main.math.constructs.Tensor3;
-import main.math.constructs.Vector;
-import main.math.utility.Functions;
-import main.math.utility.OutputVerificationScheme;
-import main.network.LearningRateAdjuster;
-import main.network.Network;
-import main.network.Network.BackpropPair;
-import main.network.NetworkFunctions;
-import main.network.NetworkRunner;
-import main.network.ProcessingScheme;
+import dezzy.neuronz2.dataio.MnistLoader;
+import dezzy.neuronz2.math.constructs.FuncDerivPair;
+import dezzy.neuronz2.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Tensor3;
+import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.utility.Functions;
+import dezzy.neuronz2.math.utility.OutputVerificationScheme;
+import dezzy.neuronz2.network.LearningRateAdjuster;
+import dezzy.neuronz2.network.Network;
+import dezzy.neuronz2.network.Network.BackpropPair;
+import dezzy.neuronz2.network.NetworkFunctions;
+import dezzy.neuronz2.network.NetworkRunner;
+import dezzy.neuronz2.network.ProcessingScheme;
+
 
 /**
  * Contains functions for testing neural networks.

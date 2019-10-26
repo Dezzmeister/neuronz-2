@@ -1,7 +1,7 @@
-package main.math.test;
+package dezzy.neuronz2.math.test;
 
-import main.math.constructs.Matrix;
-import main.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Vector;
 import test.TestUtils;
 
 /**

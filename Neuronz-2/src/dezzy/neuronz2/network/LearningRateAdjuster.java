@@ -1,4 +1,4 @@
-package main.network;
+package dezzy.neuronz2.network;
 
 /**
  * A function that adjusts the learning rate of a neural network given information about the previous epoch.

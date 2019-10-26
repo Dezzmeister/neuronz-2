@@ -1,7 +1,7 @@
-package main.math.constructs;
+package dezzy.neuronz2.math.constructs;
 
-import main.math.utility.DoubleApplier;
-import main.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.utility.DoubleApplier;
+import dezzy.neuronz2.math.utility.DoubleOperator;
 
 /**
  * Represents anything that contains a collection of double elements.

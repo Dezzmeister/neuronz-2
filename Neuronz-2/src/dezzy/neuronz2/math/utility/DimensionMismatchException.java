@@ -1,4 +1,4 @@
-package main.math.utility;
+package dezzy.neuronz2.math.utility;
 
 /**
  * Thrown when the dimension(s) of a value do not match the expected dimension(s).

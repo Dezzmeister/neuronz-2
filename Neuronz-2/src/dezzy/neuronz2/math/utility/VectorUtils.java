@@ -1,6 +1,6 @@
-package main.math.utility;
+package dezzy.neuronz2.math.utility;
 
-import main.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.Vector;
 
 /**
  * Utility functions for Vectors that do not belong in the {@link Vector} class.

@@ -1,8 +1,8 @@
-package main.math.constructs;
+package dezzy.neuronz2.math.constructs;
 
-import main.math.utility.DimensionMismatchException;
-import main.math.utility.DoubleApplier;
-import main.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.utility.DimensionMismatchException;
+import dezzy.neuronz2.math.utility.DoubleApplier;
+import dezzy.neuronz2.math.utility.DoubleOperator;
 
 /**
  * Represents a Vector with any number of elements.

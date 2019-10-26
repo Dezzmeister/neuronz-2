@@ -1,4 +1,4 @@
-package main.network;
+package dezzy.neuronz2.network;
 
 /**
  * How {@link NetworkRunner} should train a network.

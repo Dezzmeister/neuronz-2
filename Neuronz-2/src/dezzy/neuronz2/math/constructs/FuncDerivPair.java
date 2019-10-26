@@ -1,8 +1,8 @@
-package main.math.constructs;
+package dezzy.neuronz2.math.constructs;
 
 import java.io.Serializable;
 
-import main.math.utility.DoubleApplier;
+import dezzy.neuronz2.math.utility.DoubleApplier;
 
 /**
  * Contains a function and its derivative with respect to the original function's input.

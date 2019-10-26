@@ -1,10 +1,10 @@
-package main.dataio;
+package dezzy.neuronz2.dataio;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import main.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.Vector;
 
 /**
  * Loads MNIST handwritten image data.

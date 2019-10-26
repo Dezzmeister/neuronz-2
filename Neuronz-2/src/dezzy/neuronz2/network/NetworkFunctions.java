@@ -1,9 +1,9 @@
-package main.network;
+package dezzy.neuronz2.network;
 
-import main.math.constructs.Matrix;
-import main.math.constructs.Vector;
-import main.math.utility.DoubleApplier;
-import main.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.utility.DoubleApplier;
+import dezzy.neuronz2.math.utility.DoubleOperator;
 
 /**
  * Contains general mathematical functions for neural networks.

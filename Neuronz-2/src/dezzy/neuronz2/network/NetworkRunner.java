@@ -1,4 +1,4 @@
-package main.network;
+package dezzy.neuronz2.network;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -8,10 +8,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import main.math.constructs.Tensor3;
-import main.math.constructs.Vector;
-import main.math.utility.OutputVerificationScheme;
-import main.network.Network.BackpropPair;
+import dezzy.neuronz2.math.constructs.Tensor3;
+import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.utility.OutputVerificationScheme;
+import dezzy.neuronz2.network.Network.BackpropPair;
 
 /**
  * Trains a neural network.

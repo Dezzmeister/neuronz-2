@@ -1,6 +1,6 @@
-package main.math.test;
+package dezzy.neuronz2.math.test;
 
-import main.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Matrix;
 
 /**
  * Testing hardware speed by multiplying large matrices

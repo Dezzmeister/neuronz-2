@@ -1,6 +1,6 @@
-package main.math.utility;
+package dezzy.neuronz2.math.utility;
 
-import main.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.Vector;
 
 /**
  * Defines a scheme to evaluate the success of one forward pass of a neural network.

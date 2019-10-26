@@ -1,4 +1,4 @@
-package main.math.constructs;
+package dezzy.neuronz2.math.constructs;
 
 
 public interface Transformable {

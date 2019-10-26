@@ -1,9 +1,10 @@
-package main.network;
+package dezzy.neuronz2.network;
 
 import java.util.concurrent.Callable;
 
-import main.math.constructs.Tensor3;
-import main.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.Tensor3;
+import dezzy.neuronz2.math.constructs.Vector;
+
 
 /**
  * One forward and backward pass through the network.

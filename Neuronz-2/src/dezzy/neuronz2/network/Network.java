@@ -1,4 +1,4 @@
-package main.network;
+package dezzy.neuronz2.network;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,12 +8,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
 
-import main.math.constructs.FuncDerivPair;
-import main.math.constructs.Matrix;
-import main.math.constructs.Tensor3;
-import main.math.constructs.Vector;
-import main.math.utility.DoubleApplier;
-import main.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.constructs.FuncDerivPair;
+import dezzy.neuronz2.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Tensor3;
+import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.utility.DoubleApplier;
+import dezzy.neuronz2.math.utility.DoubleOperator;
+
 
 /**
  * A neural network. The weights and biases of the network are represented as a rank 3 tensor.

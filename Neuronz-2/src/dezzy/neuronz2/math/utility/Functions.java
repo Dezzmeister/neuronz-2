@@ -1,4 +1,4 @@
-package main.math.utility;
+package dezzy.neuronz2.math.utility;
 
 /**
  * Contains important mathematical functions.
