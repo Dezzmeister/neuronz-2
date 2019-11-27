@@ -150,6 +150,73 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	}
 	
 	/**
+	 * Convolves this matrix with a kernel and applies a modifier function to each resulting element.
+	 * 
+	 * @param kernel kernel matrix
+	 * @param modifier modifier function
+	 * @return convolution of this matrix and the kernel, with size <code>[this.rows - kernel.rows][this.cols - kernel.cols]</code>
+	 * and modifier function applied
+	 */
+	public final Matrix convolve(final Matrix kernel, final DoubleApplier modifier) {
+		final double[][] out = new double[rows - kernel.rows][cols - kernel.cols];
+		
+		for (int row = 0; row < rows - kernel.rows; row++) {
+			for (int col = 0; col < cols - kernel.cols; col++) {
+				final Matrix submatrix = submatrix(row, col, kernel.rows, kernel.cols);
+				final double frobeniusProduct = modifier.apply(submatrix.frobenius(kernel));
+				
+				out[row][col] = frobeniusProduct;
+			}
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Gets a submatrix within this matrix.
+	 * 
+	 * @param row starting row (inclusive) within this matrix
+	 * @param col starting column (inclusive) within this matrix
+	 * @param subRows number of rows in the submatrix
+	 * @param subCols number of columns in the submatrix
+	 * @return submatrix with size <code>[subRows][subCols]</code>
+	 */
+	private final Matrix submatrix(final int row, final int col, final int subRows, final int subCols) {
+		final double[][] out = new double[subRows][subCols];
+		
+		for (int rowIndex = 0; rowIndex < subRows; rowIndex++) {
+			for (int colIndex = 0; colIndex < subCols; colIndex++) {
+				out[rowIndex][colIndex] = values[rowIndex + subRows][colIndex + subCols];
+			}
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Computes the Frobenius inner product of two matrices. This works exactly like the dot
+	 * product for vectors, but is extended to matrices.
+	 * 
+	 * @param other other matrix with the same dimensions as this one
+	 * @return scalar Frobenius inner product
+	 */
+	public final double frobenius(final Matrix other) {
+		if (rows != other.rows || cols != other.cols) {
+			throw new DimensionMismatchException("Matrices must be the same size!");
+		}
+		
+		double product = 0;
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				product += values[row][col] * other.values[row][col];
+			}
+		}
+		
+		return product;
+	}
+	
+	/**
 	 * Returns the transpose of this Matrix (every value is mirrored over the diagonal).
 	 * 
 	 * @return the transpose of this Matrix
