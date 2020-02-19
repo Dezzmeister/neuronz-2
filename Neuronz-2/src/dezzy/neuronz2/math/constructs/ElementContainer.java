@@ -28,17 +28,23 @@ public abstract class ElementContainer<T> {
 	public abstract T transform(final DoubleApplier transformation);
 	
 	/**
-	 * Addition, represented as a FloatOperator
+	 * Addition, represented as a DoubleOperator
 	 */
 	private static final DoubleOperator ADD = (a, b) -> a + b;
 	
 	/**
-	 * Subtraction, represented as a FloatOperator
+	 * Subtraction, represented as a DoubleOperator
 	 */
 	private static final DoubleOperator SUBTRACT = (a, b) -> a - b;
 	
+	/**
+	 * Multiplication, represented as a DoubleOperator
+	 */
 	private static final DoubleOperator MULTIPLY = (a, b) -> a * b;
 	
+	/**
+	 * Division, represented as a DoubleOperator
+	 */
 	private static final DoubleOperator DIVIDE = (a, b) -> a / b;
 	
 	/**
