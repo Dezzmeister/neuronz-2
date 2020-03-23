@@ -5,6 +5,7 @@ import java.io.Serializable;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.utility.MatrixCondenser;
 
 
 /**
@@ -166,6 +167,32 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 				final double frobeniusProduct = modifier.apply(submatrix.frobenius(kernel));
 				
 				out[row][col] = frobeniusProduct;
+			}
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Applies a pooling transformation to this matrix, and returns a smaller matrix with the result. Unlike {@linkplain #convolve convolution},
+	 * the window is not swept over the matrix; the function is applied to consecutive (and separate) windows.
+	 * (No window overlaps a previous window.) If there are not enough elements in the window (i.e., the window overlaps
+	 * the border of the matrix), the pooling operation will not be applied to the extra elements.
+	 * 
+	 * @param windowRows number of rows in the pooling window
+	 * @param windowCols number of columns in the pooling window
+	 * @param operation pooling function to apply to the window
+	 * @return a matrix with the pooling function applied to every consecutive window over the image 
+	 */
+	public final Matrix poolingTransform(final int windowRows, final int windowCols, final MatrixCondenser operation) {
+		final double[][] out = new double[rows / windowRows][cols / windowCols];
+		
+		for (int row = 0; row < out.length; row += windowRows) {
+			for (int col = 0; col < out[0].length; col += windowCols) {
+				final Matrix submatrix = submatrix(row, col, windowRows, windowCols);
+				final double value = operation.condense(submatrix);
+				
+				out[row][col] = value;
 			}
 		}
 		
