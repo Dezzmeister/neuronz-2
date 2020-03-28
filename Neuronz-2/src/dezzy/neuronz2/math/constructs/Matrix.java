@@ -159,10 +159,10 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	 * and modifier function applied
 	 */
 	public final Matrix convolve(final Matrix kernel, final DoubleApplier modifier) {
-		final double[][] out = new double[rows - kernel.rows][cols - kernel.cols];
+		final double[][] out = new double[rows - kernel.rows + 1][cols - kernel.cols + 1];
 		
-		for (int row = 0; row < rows - kernel.rows; row++) {
-			for (int col = 0; col < cols - kernel.cols; col++) {
+		for (int row = 0; row < rows - kernel.rows + 1; row++) {
+			for (int col = 0; col < cols - kernel.cols + 1; col++) {
 				final Matrix submatrix = submatrix(row, col, kernel.rows, kernel.cols);
 				final double frobeniusProduct = modifier.apply(submatrix.frobenius(kernel));
 				
@@ -213,7 +213,7 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 		
 		for (int rowIndex = 0; rowIndex < subRows; rowIndex++) {
 			for (int colIndex = 0; colIndex < subCols; colIndex++) {
-				out[rowIndex][colIndex] = values[rowIndex + subRows][colIndex + subCols];
+				out[rowIndex][colIndex] = values[row + rowIndex][col + colIndex];
 			}
 		}
 		

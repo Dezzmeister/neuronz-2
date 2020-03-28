@@ -82,5 +82,20 @@ public final class MatrixTest {
 		System.out.println();
 		
 		System.out.println("M5 * v0: " + m5.multiply(v0));
+		
+		System.out.println("\nConvolution:");
+		final Matrix kernel = new Matrix(new double[][] {
+			{-1., 0.5},
+			{0.2, 3.}
+		});
+		
+		final Matrix image = new Matrix(new double[][] {
+			{4, 3, 2, 1},
+			{1, 2, 0, 4},
+			{6, 1, 3, 2},
+			{7, 8, 9, 9}
+		});
+		
+		System.out.println(image.convolve(kernel, d -> d));
 	}
 }

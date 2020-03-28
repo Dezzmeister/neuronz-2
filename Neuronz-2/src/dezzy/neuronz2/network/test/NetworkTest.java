@@ -1,4 +1,4 @@
-package main.network.test;
+package dezzy.neuronz2.network.test;
 
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
