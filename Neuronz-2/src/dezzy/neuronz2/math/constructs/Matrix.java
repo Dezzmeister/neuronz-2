@@ -200,6 +200,49 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	}
 	
 	/**
+	 * Pads this matrix with a constant value, giving a larger matrix with the padding. The new matrix has a size of
+	 * ({@link #rows} + <code>(padWidth * 2)</code>) by ({@link #cols} + <code>(padWidth * 2</code>). A copy of the values
+	 * in the current matrix is centered in the new matrix.
+	 * 
+	 * @param padWidth width of the padding
+	 * @param value value of each padded location
+	 * @return a version of this matrix with padding added
+	 */
+	public final Matrix pad(final int padWidth, final double value) {
+		final double[][] out = new double[rows + (2 * padWidth)][cols + (2 * padWidth)];
+		
+		for (int row = 0; row < padWidth; row++) {
+			for (int col = 0; col < out[0].length; col++) {
+				out[row][col] = value;
+			}
+		}
+		
+		for (int row = rows + padWidth; row < out.length; row++) {
+			for (int col = 0; col < out[0].length; col++) {
+				out[row][col] = value;
+			}
+		}
+		
+		for (int col = 0; col < padWidth; col++) {
+			for (int row = padWidth; row < rows + padWidth; row++) {
+				out[row][col] = value;
+			}
+		}
+		
+		for (int col = cols + padWidth; col < out[0].length; col++) {
+			for (int row = padWidth; row < rows + padWidth; row++) {
+				out[row][col] = value;
+			}
+		}
+		
+		for (int row = padWidth; row < rows + padWidth; row++) {
+			System.arraycopy(values, row - padWidth, out, row, values[0].length);
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
 	 * Gets a submatrix within this matrix.
 	 * 
 	 * @param row starting row (inclusive) within this matrix
