@@ -2,6 +2,7 @@ package dezzy.neuronz2.math.test;
 
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.utility.MatrixCondenser;
 import test.TestUtils;
 
 /**
@@ -96,6 +97,25 @@ public final class MatrixTest {
 			{7, 8, 9, 9}
 		});
 		
-		System.out.println(image.convolve(kernel, d -> d));
+		System.out.println(image.convolve(kernel, 1, d -> d));
+		
+		final MatrixCondenser maxPooling = m -> {
+			double max = Double.NEGATIVE_INFINITY;
+			
+			for (int row = 0; row < m.rows; row++) {
+				for (int col = 0; col < m.cols; col++) {
+					double v = m.get(row, col);
+					
+					if (v > max) {
+						max = v;
+					}
+				}
+			}
+			
+			return max;
+		};
+		
+		System.out.println("\nMax Pooling:");
+		System.out.println(image.poolingTransform(3, 3, 1, 1, maxPooling));
 	}
 }

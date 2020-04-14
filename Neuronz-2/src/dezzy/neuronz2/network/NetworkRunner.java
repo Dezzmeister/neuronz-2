@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 import dezzy.neuronz2.math.constructs.Tensor3;
 import dezzy.neuronz2.math.constructs.Vector;
 import dezzy.neuronz2.math.utility.OutputVerificationScheme;
-import dezzy.neuronz2.network.Network.BackpropPair;
+import dezzy.neuronz2.network.Network.BackpropTriplet;
 
 /**
  * Trains a neural network.
@@ -126,7 +126,7 @@ public final class NetworkRunner {
 				final Vector[] activations;
 				
 				if (learnFromTestData) {
-					final BackpropPair result = network.backprop(testData[j].input, testData[j].output);
+					final BackpropTriplet result = network.backprop(testData[j].input, testData[j].output);
 					network.applyWeightDeltas(result.weightDeltas, learningRate);
 					activations = result.activations;
 				} else {

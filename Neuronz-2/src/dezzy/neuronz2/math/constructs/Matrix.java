@@ -154,20 +154,27 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	 * Convolves this matrix with a kernel and applies a modifier function to each resulting element.
 	 * 
 	 * @param kernel kernel matrix
+	 * @param stride kernel stride
 	 * @param modifier modifier function
 	 * @return convolution of this matrix and the kernel, with size <code>[this.rows - kernel.rows][this.cols - kernel.cols]</code>
 	 * and modifier function applied
 	 */
-	public final Matrix convolve(final Matrix kernel, final DoubleApplier modifier) {
-		final double[][] out = new double[rows - kernel.rows + 1][cols - kernel.cols + 1];
+	public final Matrix convolve(final Matrix kernel, final int stride, final DoubleApplier modifier) {
+		final double[][] out = new double[((rows - kernel.rows) / stride) + 1][((cols - kernel.cols) / stride) + 1];
 		
-		for (int row = 0; row < rows - kernel.rows + 1; row++) {
-			for (int col = 0; col < cols - kernel.cols + 1; col++) {
+		int rowIndex = 0;
+		for (int row = 0; row < rows - kernel.rows + 1; row += stride) {
+			
+			int colIndex = 0;
+			for (int col = 0; col < cols - kernel.cols + 1; col += stride) {
 				final Matrix submatrix = submatrix(row, col, kernel.rows, kernel.cols);
 				final double frobeniusProduct = modifier.apply(submatrix.frobenius(kernel));
 				
-				out[row][col] = frobeniusProduct;
+				out[rowIndex][colIndex] = frobeniusProduct;
+				colIndex++;
 			}
+			colIndex = 0;
+			rowIndex++;
 		}
 		
 		return new Matrix(out);
@@ -184,16 +191,22 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	 * @param operation pooling function to apply to the window
 	 * @return a matrix with the pooling function applied to every consecutive window over the image 
 	 */
-	public final Matrix poolingTransform(final int windowRows, final int windowCols, final MatrixCondenser operation) {
-		final double[][] out = new double[rows / windowRows][cols / windowCols];
+	public final Matrix poolingTransform(final int windowRows, final int windowCols, final int rowStride, final int colStride, final MatrixCondenser operation) {
+		final double[][] out = new double[((rows - windowRows) / rowStride) + 1][((cols - windowCols) / colStride) + 1];
 		
-		for (int row = 0; row < out.length; row += windowRows) {
-			for (int col = 0; col < out[0].length; col += windowCols) {
+		int rowIndex = 0;
+		for (int row = 0; row < rows - windowRows + 1; row += rowStride) {
+			
+			int colIndex = 0;
+			for (int col = 0; col < cols - windowCols + 1; col += colStride) {
 				final Matrix submatrix = submatrix(row, col, windowRows, windowCols);
-				final double value = operation.condense(submatrix);
+				final double condensed = operation.condense(submatrix);
 				
-				out[row][col] = value;
+				out[rowIndex][colIndex] = condensed;
+				colIndex++;
 			}
+			colIndex = 0;
+			rowIndex++;
 		}
 		
 		return new Matrix(out);

@@ -192,19 +192,19 @@ public final class Network implements Serializable {
 	 * @param ideal expected outputs
 	 * @return the weight deltas and activations
 	 */
-	public final BackpropPair backprop(final Vector input, final Vector ideal) {		
+	public final BackpropTriplet backprop(final Vector input, final Vector ideal) {		
 		final Vector[] activations = run(input);
 		
 		final Matrix[] weightDeltaTensor = new Matrix[weightTensor.dimension]; 
 		
-		Vector errorOutputDeriv = activations[layers - 1].elementOperation(ideal, costFunctionDerivative);
+		Vector errorOutputDeriv = activations[layers - 1].elementOperation(ideal, costFunctionDerivative);	//dE/dout
 		
 		for (int i = layers - 1; i >= 1; i--) {
 			final DoubleApplier activationFuncDeriv = activationFunctions[i - 1].derivative;
 			
-			final Vector activationRawInputDeriv = activations[i].transform(activationFuncDeriv);
-			final Vector errorInputDeriv = errorOutputDeriv.hadamard(activationRawInputDeriv);
-			final Matrix weightDeltas;
+			final Vector activationRawInputDeriv = activations[i].transform(activationFuncDeriv);	//dout/din
+			final Vector errorInputDeriv = errorOutputDeriv.hadamard(activationRawInputDeriv);	//dE/din
+			final Matrix weightDeltas;	//dE/dW
 			
 			if (i == layers - 1) {
 				weightDeltas = errorInputDeriv.outerProduct(activations[i - 1]);	//Rank 2 Tensor!
@@ -223,7 +223,7 @@ public final class Network implements Serializable {
 			}
 		}
 		
-		return new BackpropPair(new Tensor3(weightDeltaTensor), activations);
+		return new BackpropTriplet(new Tensor3(weightDeltaTensor), activations, errorOutputDeriv);
 	}
 	
 	/**
@@ -262,7 +262,7 @@ public final class Network implements Serializable {
 	 *
 	 * @author Joe Desmond
 	 */
-	public static final class BackpropPair {
+	public static final class BackpropTriplet {
 		/**
 		 * Weight gradient
 		 */
@@ -274,14 +274,21 @@ public final class Network implements Serializable {
 		public final Vector[] activations;
 		
 		/**
+		 * Derivative of the error with respect to the original inputs to the network
+		 */
+		public final Vector errorInputDeriv;
+		
+		/**
 		 * Creates a BackpropPair representing the result of one forward and backward pass through the network.
 		 * 
 		 * @param _weightDeltas weight gradient from backward pass
 		 * @param _activations activations from forward pass
+		 * @param _errorInputDeriv derivative of the error with respect to the original network inputs
 		 */
-		public BackpropPair(final Tensor3 _weightDeltas, final Vector[] _activations) {
+		public BackpropTriplet(final Tensor3 _weightDeltas, final Vector[] _activations, final Vector _errorInputDeriv) {
 			weightDeltas = _weightDeltas;
 			activations = _activations;
+			errorInputDeriv = _errorInputDeriv;
 		}
 	}
 }

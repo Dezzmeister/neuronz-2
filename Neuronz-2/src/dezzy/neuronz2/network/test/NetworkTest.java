@@ -25,7 +25,7 @@ import dezzy.neuronz2.math.utility.Functions;
 import dezzy.neuronz2.math.utility.OutputVerificationScheme;
 import dezzy.neuronz2.network.LearningRateAdjuster;
 import dezzy.neuronz2.network.Network;
-import dezzy.neuronz2.network.Network.BackpropPair;
+import dezzy.neuronz2.network.Network.BackpropTriplet;
 import dezzy.neuronz2.network.NetworkFunctions;
 import dezzy.neuronz2.network.NetworkRunner;
 import dezzy.neuronz2.network.ProcessingScheme;
@@ -217,7 +217,7 @@ public final class NetworkTest {
 			
 			Tensor3 weightDeltas = network.weightTensor.minus(network.weightTensor);
 			for (int j = 0; j < 50000 - miniBatchSize; j++) {
-				final BackpropPair result = network.backprop(data[j].image, data[j].digit);
+				final BackpropTriplet result = network.backprop(data[j].image, data[j].digit);
 				Tensor3 deltas = result.weightDeltas;
 				weightDeltas = weightDeltas.plus(deltas);
 				
@@ -280,7 +280,7 @@ public final class NetworkTest {
 		final double eta = 0.5f;
 		
 		for (int i = 0; i < 1000000; i++) {
-			final BackpropPair result = network.backprop(input, ideal);
+			final BackpropTriplet result = network.backprop(input, ideal);
 			final Tensor3 deltas = result.weightDeltas;
 			final Vector output = network.getLatestOutput(result.activations);
 			network.applyWeightDeltas(deltas, eta);
