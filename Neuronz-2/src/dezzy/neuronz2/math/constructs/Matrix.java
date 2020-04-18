@@ -151,13 +151,13 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	}
 	
 	/**
-	 * Convolves this matrix with a kernel and applies a modifier function to each resulting element.
+	 * Convolves this matrix with a kernel and applies a modifier function to each resulting element. This is technically
+	 * the cross-correlation operation because the kernel is never flipped.
 	 * 
 	 * @param kernel kernel matrix
 	 * @param stride kernel stride
 	 * @param modifier modifier function
-	 * @return convolution of this matrix and the kernel, with size <code>[this.rows - kernel.rows][this.cols - kernel.cols]</code>
-	 * and modifier function applied
+	 * @return convolution of this matrix and the kernel, with modifier function applied
 	 */
 	public final Matrix convolve(final Matrix kernel, final int stride, final DoubleApplier modifier) {
 		final double[][] out = new double[((rows - kernel.rows) / stride) + 1][((cols - kernel.cols) / stride) + 1];
@@ -264,7 +264,7 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	 * @param subCols number of columns in the submatrix
 	 * @return submatrix with size <code>[subRows][subCols]</code>
 	 */
-	private final Matrix submatrix(final int row, final int col, final int subRows, final int subCols) {
+	final Matrix submatrix(final int row, final int col, final int subRows, final int subCols) {
 		final double[][] out = new double[subRows][subCols];
 		
 		for (int rowIndex = 0; rowIndex < subRows; rowIndex++) {
