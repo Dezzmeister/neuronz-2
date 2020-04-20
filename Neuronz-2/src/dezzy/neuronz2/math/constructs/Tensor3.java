@@ -21,7 +21,7 @@ public final class Tensor3 extends ElementContainer<Tensor3> implements Serializ
 	private static final long serialVersionUID = -5804689492753369823L;
 
 	/**
-	 * Values of the tensor
+	 * Layers of the tensor
 	 */
 	private final Matrix[] matrices;
 	
@@ -52,23 +52,16 @@ public final class Tensor3 extends ElementContainer<Tensor3> implements Serializ
 		dimension = values.length;
 		matrices = new Matrix[dimension];
 		
-		int rows = -1;
-		int cols = -1;
-		
 		for (int i = 0; i < values.length; i++) {
-			if (rows == -1) {
-				rows = values[i].length;
-				cols = values[i][0].length;
+			if (i == 0) {
+				matrices[0] = new Matrix(values[i]);
 			} else {
-				int nextRows = values[i].length;
-				int nextCols = values[i][0].length;
+				matrices[i] = new Matrix(values[i]);
 				
-				if ((nextRows != rows) || (nextCols != cols)) {
+				if (!matrices[i].isSameDimensionsAs(matrices[0])) {
 					throw new DimensionMismatchException("Tensor must be uniform; array cannot be irregular!");
 				}
-			}			
-			
-			matrices[i] = new Matrix(values[i]);
+			}
 		}
 	}
 	
@@ -211,18 +204,18 @@ public final class Tensor3 extends ElementContainer<Tensor3> implements Serializ
 	
 	@Override
 	public final String toString() {
-		String out = "[";
+		final StringBuilder out = new StringBuilder("[");
 		
 		for (int layer = 0; layer < dimension; layer++) {
-			out += matrices[layer].toString();
+			out.append(matrices[layer].toString());
 			
 			if (layer != dimension - 1) {
-				out += "\n\n";
+				out.append("\n\n");
 			} else {
-				out += "]";
+				out.append("]");
 			}
 		}
 		
-		return out;
+		return out.toString();
 	}
 }

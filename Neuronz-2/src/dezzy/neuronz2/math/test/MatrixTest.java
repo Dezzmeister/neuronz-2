@@ -1,8 +1,8 @@
 package dezzy.neuronz2.math.test;
 
+import dezzy.neuronz2.cnn.pooling.PoolingOperation;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Vector;
-import dezzy.neuronz2.math.utility.MatrixCondenser;
 import test.TestUtils;
 
 /**
@@ -99,7 +99,7 @@ public final class MatrixTest {
 		
 		System.out.println(image.convolve(kernel, 1, d -> d));
 		
-		final MatrixCondenser maxPooling = m -> {
+		final PoolingOperation maxPooling = m -> {
 			double max = Double.NEGATIVE_INFINITY;
 			
 			for (int row = 0; row < m.rows; row++) {

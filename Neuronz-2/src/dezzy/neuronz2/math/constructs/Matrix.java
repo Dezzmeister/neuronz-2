@@ -2,10 +2,12 @@ package dezzy.neuronz2.math.constructs;
 
 import java.io.Serializable;
 
+import dezzy.neuronz2.cnn.pooling.PoolingOperation;
+import dezzy.neuronz2.cnn.pooling.PoolingResult;
+import dezzy.neuronz2.cnn.pooling.SliceResult;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
-import dezzy.neuronz2.math.utility.MatrixCondenser;
 
 
 /**
@@ -189,10 +191,13 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	 * @param windowRows number of rows in the pooling window
 	 * @param windowCols number of columns in the pooling window
 	 * @param operation pooling function to apply to the window
-	 * @return a matrix with the pooling function applied to every consecutive window over the image 
+	 * @return 2 matrices:<br>
+	 * 			a matrix with the pooling function applied to every consecutive window over the image<br>
+	 * 			a modified version of this matrix to be used when calculating the gradient of the error with respect to the input for a given CNN layer
 	 */
-	public final Matrix poolingTransform(final int windowRows, final int windowCols, final int rowStride, final int colStride, final MatrixCondenser operation) {
+	public final PoolingResult poolingTransform(final int windowRows, final int windowCols, final int rowStride, final int colStride, final PoolingOperation operation) {
 		final double[][] out = new double[((rows - windowRows) / rowStride) + 1][((cols - windowCols) / colStride) + 1];
+		final double[][] modifiedInput = new double[rows][cols];
 		
 		int rowIndex = 0;
 		for (int row = 0; row < rows - windowRows + 1; row += rowStride) {
@@ -200,16 +205,29 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 			int colIndex = 0;
 			for (int col = 0; col < cols - windowCols + 1; col += colStride) {
 				final Matrix submatrix = submatrix(row, col, windowRows, windowCols);
-				final double condensed = operation.condense(submatrix);
+				final SliceResult sliceResult = operation.condense(submatrix);
 				
-				out[rowIndex][colIndex] = condensed;
+				out[rowIndex][colIndex] = sliceResult.result;
+				
+				final Matrix modified = sliceResult.modifiedInputSlice;
+				
+				if ((modified.rows != windowRows) || (modified.cols != windowCols)) {
+					throw new DimensionMismatchException("Size of pooling window must match size of modified slice matrix returned from PoolingOperation!");
+				}
+				
+				for (int row2 = row; row2 < row + windowRows; row2++) {
+					for (int col2 = col; col2 < col + windowCols; col2++) {
+						modifiedInput[row2][col2] += modified.values[row2 - row][col2 - col];
+					}
+				}
+				
 				colIndex++;
 			}
 			colIndex = 0;
 			rowIndex++;
 		}
 		
-		return new Matrix(out);
+		return new PoolingResult(new Matrix(out), new Matrix(modifiedInput));
 	}
 	
 	/**
