@@ -231,6 +231,51 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	}
 	
 	/**
+	 * Expands this matrix to be the same size as the given matrix, then multiplies them element-wise.
+	 * Used in backpropagation for {@linkplain dezzy.neuronz2.cnn.layers.PoolingLayer pooling layers}.
+	 * In pooling layers, this function is called by the smaller matrix, which is the derivative of the
+	 * error with respect to the pooling layer's output. The argument to this function is the 
+	 * {@linkplain PoolingResult#modifiedInput modified input} (returned by 
+	 * {@link #poolingTransform(int, int, int, int, PoolingOperation) poolingTransform()}).
+	 * 
+	 * @param other larger matrix
+	 * @return a matrix with the same size as the larger matrix
+	 */
+	public final Matrix expandAndMultiply(final Matrix other) {
+		final double[][] out = new double[other.rows][other.cols];
+		
+		final int rowStride = other.rows / rows;
+		final int colStride = other.cols / cols;
+		
+		int smallRowIndex = 0;
+		int smallColIndex = 0;
+		
+		// These counts are used to avoid the modulus operation and floating point addition
+		int rowCount = 0;
+		int colCount = 0;
+		
+		for (int row = 0; row < other.rows; row++) {
+			for (int col = 0; col < other.cols; col++) {
+				out[row][col] = other.values[row][col] * values[smallRowIndex][smallColIndex];
+				
+				colCount++;
+				if (colCount == colStride) {
+					smallColIndex++;
+					colCount = 0;
+				}
+			}
+			
+			rowCount++;
+			if (rowCount == rowStride) {
+				smallRowIndex++;
+				rowCount = 0;
+			}
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
 	 * Pads this matrix with a constant value, giving a larger matrix with the padding. The new matrix has a size of
 	 * ({@link #rows} + <code>(padWidth * 2)</code>) by ({@link #cols} + <code>(padWidth * 2</code>). A copy of the values
 	 * in the current matrix is centered in the new matrix.

@@ -99,23 +99,7 @@ public final class MatrixTest {
 		
 		System.out.println(image.convolve(kernel, 1, d -> d));
 		
-		final PoolingOperation maxPooling = m -> {
-			double max = Double.NEGATIVE_INFINITY;
-			
-			for (int row = 0; row < m.rows; row++) {
-				for (int col = 0; col < m.cols; col++) {
-					double v = m.get(row, col);
-					
-					if (v > max) {
-						max = v;
-					}
-				}
-			}
-			
-			return max;
-		};
-		
 		System.out.println("\nMax Pooling:");
-		System.out.println(image.poolingTransform(3, 3, 1, 1, maxPooling));
+		System.out.println(image.poolingTransform(3, 3, 1, 1, PoolingOperation.MAX_POOLING).result);
 	}
 }
