@@ -3,8 +3,6 @@ package dezzy.neuronz2.math.constructs;
 import java.io.Serializable;
 
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
-import dezzy.neuronz2.cnn.pooling.PoolingResult;
-import dezzy.neuronz2.cnn.pooling.SliceResult;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
@@ -183,21 +181,17 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	}
 	
 	/**
-	 * Applies a pooling transformation to this matrix, and returns a smaller matrix with the result. Unlike {@linkplain #convolve convolution},
-	 * the window is not swept over the matrix; the function is applied to consecutive (and separate) windows.
-	 * (No window overlaps a previous window.) If there are not enough elements in the window (i.e., the window overlaps
+	 * Applies a pooling transformation to this matrix, and returns a smaller matrix with the result. 
+	 * If there are not enough elements in the window (i.e., the window overlaps
 	 * the border of the matrix), the pooling operation will not be applied to the extra elements.
 	 * 
 	 * @param windowRows number of rows in the pooling window
 	 * @param windowCols number of columns in the pooling window
 	 * @param operation pooling function to apply to the window
-	 * @return 2 matrices:<br>
-	 * 			a matrix with the pooling function applied to every consecutive window over the image<br>
-	 * 			a modified version of this matrix to be used when calculating the gradient of the error with respect to the input for a given CNN layer
+	 * @return a matrix with the pooling function applied to every consecutive window over the image
 	 */
-	public final PoolingResult poolingTransform(final int windowRows, final int windowCols, final int rowStride, final int colStride, final PoolingOperation operation) {
+	public final Matrix poolingTransform(final int windowRows, final int windowCols, final int rowStride, final int colStride, final PoolingOperation operation) {
 		final double[][] out = new double[((rows - windowRows) / rowStride) + 1][((cols - windowCols) / colStride) + 1];
-		final double[][] modifiedInput = new double[rows][cols];
 		
 		int rowIndex = 0;
 		for (int row = 0; row < rows - windowRows + 1; row += rowStride) {
@@ -205,29 +199,16 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 			int colIndex = 0;
 			for (int col = 0; col < cols - windowCols + 1; col += colStride) {
 				final Matrix submatrix = submatrix(row, col, windowRows, windowCols);
-				final SliceResult sliceResult = operation.condense(submatrix);
+				final double result = operation.condense(submatrix);
 				
-				out[rowIndex][colIndex] = sliceResult.result;
-				
-				final Matrix modified = sliceResult.modifiedInputSlice;
-				
-				if ((modified.rows != windowRows) || (modified.cols != windowCols)) {
-					throw new DimensionMismatchException("Size of pooling window must match size of modified slice matrix returned from PoolingOperation!");
-				}
-				
-				for (int row2 = row; row2 < row + windowRows; row2++) {
-					for (int col2 = col; col2 < col + windowCols; col2++) {
-						modifiedInput[row2][col2] += modified.values[row2 - row][col2 - col];
-					}
-				}
-				
+				out[rowIndex][colIndex] = result;				
 				colIndex++;
 			}
 			colIndex = 0;
 			rowIndex++;
 		}
 		
-		return new PoolingResult(new Matrix(out), new Matrix(modifiedInput));
+		return new Matrix(out);
 	}
 	
 	/**
@@ -312,7 +293,26 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 		}
 		
 		for (int row = padWidth; row < rows + padWidth; row++) {
-			System.arraycopy(values, row - padWidth, out, row, values[0].length);
+			System.arraycopy(values[row], 0, out[row], padWidth, values[0].length);
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Pads this matrix with zeroes. Functionally equivalent to calling 
+	 * {@link #pad(int, double) pad(padWidth, 0.0)}. The difference between the two
+	 * is that this exploits the fact that arrays are initially zeroed, making it faster than a call to
+	 * {@link #pad(int, double) pad(padWidth, 0.0)}.
+	 * 
+	 * @param padWidth width of the padding
+	 * @return a version of this matrix with padding added
+	 */
+	public final Matrix padZero(final int padWidth) {
+		final double[][] out = new double[rows + (2 * padWidth)][cols + (2 * padWidth)];
+		
+		for (int row = padWidth; row < rows + padWidth; row++) {
+			System.arraycopy(values[row], 0, out[row], padWidth, values[0].length);
 		}
 		
 		return new Matrix(out);
@@ -327,7 +327,7 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	 * @param subCols number of columns in the submatrix
 	 * @return submatrix with size <code>[subRows][subCols]</code>
 	 */
-	final Matrix submatrix(final int row, final int col, final int subRows, final int subCols) {
+	public final Matrix submatrix(final int row, final int col, final int subRows, final int subCols) {
 		final double[][] out = new double[subRows][subCols];
 		
 		for (int rowIndex = 0; rowIndex < subRows; rowIndex++) {
@@ -502,6 +502,95 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 		}
 		
 		return new Matrix(result);
+	}
+	
+	/**
+	 * An index into this matrix.
+	 *
+	 * @author Joe Desmond
+	 */
+	public final class Index {
+		
+		/**
+		 * The value at this index
+		 */
+		public final double value;
+		
+		/**
+		 * The row of <code>value</code>
+		 */
+		public final int row;
+		
+		/**
+		 * The column of <code>value</code>
+		 */
+		public final int col;
+		
+		/**
+		 * Constructs an index into this matrix, pointing at the given value located
+		 * at the given row and column.
+		 * 
+		 * @param _value value
+		 * @param _row row
+		 * @param _col column
+		 */
+		public Index(final double _value, final int _row, final int _col) {
+			value = _value;
+			row = _row;
+			col = _col;
+		}
+	}
+	
+	/**
+	 * Returns the location and value of the maximum element in this
+	 * matrix.
+	 * 
+	 * @return index to the maximum element in this matrix
+	 */
+	public final Index max() {
+		double max = Double.NEGATIVE_INFINITY;
+		int maxRow = 0;
+		int maxCol = 0;
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				final double value = values[row][col];
+				
+				if (value > max) {
+					max = value;
+					maxRow = row;
+					maxCol = col;
+				}
+			}
+		}
+		
+		return new Index(max, maxRow, maxCol);
+	}
+	
+	/**
+	 * Returns the location and value of the minimum element in this
+	 * matrix.
+	 * 
+	 * @return index to the minimum element in this matrix
+	 */
+	public final Index min() {
+		double min = Double.POSITIVE_INFINITY;
+		int minRow = 0;
+		int minCol = 0;
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				final double value = values[row][col];
+				
+				if (value < min) {
+					min = value;
+					minRow = row;
+					minCol = col;
+				}
+			}
+		}
+		
+		return new Index(min, minRow, minCol);
 	}
 	
 	/**

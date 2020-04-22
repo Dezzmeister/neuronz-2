@@ -1,7 +1,6 @@
 package dezzy.neuronz2.cnn.layers;
 
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
-import dezzy.neuronz2.cnn.pooling.PoolingResult;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
 
@@ -18,19 +17,29 @@ public class PoolingLayer implements Layer {
 	private final PoolingOperation poolingOperation;
 	
 	/**
-	 * The number of rows in the pooling window (also used as the row stride)
+	 * The number of rows in the pooling window
 	 */
 	private final int windowRows;
 	
 	/**
-	 * The number of columns in the pooling window (also used as the column stride)
+	 * The number of columns in the pooling window
 	 */
 	private final int windowCols;
 	
 	/**
-	 * The modified input to the pooling operation, used in backpropagation
+	 * The pooling window row stride
 	 */
-	private Tensor3 modifiedInput;
+	private final int rowStride;
+	
+	/**
+	 * The pooling window column stride
+	 */
+	private final int colStride;
+	
+	/**
+	 * The latest input to the pooling operation, used in backpropagation
+	 */
+	private Tensor3 latestInput;
 	
 	/**
 	 * Constructs a pooling layer with the given pooling operation and pooling window size.
@@ -39,16 +48,17 @@ public class PoolingLayer implements Layer {
 	 * @param _windowRows number of rows in the pooling window
 	 * @param _windowCols number of columns in the pooling window
 	 */
-	public PoolingLayer(final PoolingOperation _poolingOperation, final int _windowRows, final int _windowCols) {
+	public PoolingLayer(final PoolingOperation _poolingOperation, final int _windowRows, final int _windowCols, final int _rowStride, final int _colStride) {
 		poolingOperation = _poolingOperation;
 		windowRows = _windowRows;
 		windowCols = _windowCols;
+		rowStride = _rowStride;
+		colStride = _colStride;
 	}
 	
 	/**
 	 * Applies {@linkplain #poolingOperation this} pooling operation layer-wise to the given activations and returns a smaller tensor
-	 * (same number of layers; but smaller layers) for the next network layer. Saves a {@linkplain PoolingResult#modifiedInput modified version} 
-	 * of the input tensor to be used for backpropagation.
+	 * (same number of layers; but smaller layers) for the next network layer. Saves the input tensor to be used for backpropagation.
 	 * 
 	 * @param prevActivations output of previous network layer
 	 * @return output of this network layer
@@ -56,37 +66,33 @@ public class PoolingLayer implements Layer {
 	@Override
 	public Tensor3 activations(final Tensor3 prevActivations) {
 		final Matrix[] output = new Matrix[prevActivations.dimension];
-		final Matrix[] newInputs = new Matrix[prevActivations.dimension];
 		
 		for (int i = 0; i < prevActivations.dimension; i++) {
-			final PoolingResult result = prevActivations.getLayer(i).poolingTransform(windowRows, windowCols, windowRows, windowCols, poolingOperation);
+			final Matrix result = prevActivations.getLayer(i).poolingTransform(windowRows, windowCols, rowStride, colStride, poolingOperation);
 			
-			output[i] = result.result;
-			newInputs[i] = result.modifiedInput;
+			output[i] = result;
 		}
-		
-		modifiedInput = new Tensor3(newInputs);
 		
 		return new Tensor3(output);
 	}
 	
 	/**
-	 * Expands <code>errorOutputDeriv</code> so that it has the same shape as the 
-	 * {@linkplain PoolingResult#modifiedInput modified input} to this layer, 
-	 * then multiplies the expanded tensor element-wise by the modified input (chain rule).
+	 * Calculates the derivative of the error with respect to the input using 
+	 * {@link PoolingOperation#backprop(Matrix, Matrix, int, int) poolingOperation.backprop()}.
 	 * 
 	 * @param errorOutputDeriv the (partial) derivative of the network error with respect to the output of this layer
+	 * @param learningRate unused
 	 * @return the (partial) derivative of the network error with respect to the input to this layer
 	 */
 	@Override
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv) {
+	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final double learningRate) {
 		final Matrix[] errorInputDeriv = new Matrix[errorOutputDeriv.dimension];
 		
 		for (int m = 0; m < errorOutputDeriv.dimension; m++) {
 			final Matrix pooled = errorOutputDeriv.getLayer(m);
-			final Matrix input = modifiedInput.getLayer(m);
+			final Matrix input = latestInput.getLayer(m);
 			
-			errorInputDeriv[m] = pooled.expandAndMultiply(input);
+			errorInputDeriv[m] = poolingOperation.backprop(input, pooled, rowStride, colStride);
 		}
 		
 		return new Tensor3(errorInputDeriv);

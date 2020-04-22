@@ -51,10 +51,11 @@ public class ActivationLayer implements Layer {
 	 * element-wise with the given derivative (chain rule), and returns this new derivative.
 	 * 
 	 * @param errorOutputDeriv derivative of the network error with respect to this layer's output
+	 * @param learningRate unused
 	 * @return derivative of the network error with respect to this layer's input
 	 */
 	@Override
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv) {
+	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final double learningRate) {
 		final Tensor3 outputInputDeriv = latestInput.transform(activationFunction.derivative);
 		
 		return errorOutputDeriv.hadamard(outputInputDeriv);

@@ -27,7 +27,8 @@ public interface Layer {
 	 * function may return a tensor with a different shape than the input tensor.
 	 * 
 	 * @param errorOutputDeriv (partial) derivative of the network's error with respect to the output of this layer
+	 * @param learningRate learning rate used for gradient descent; not all layers need this
 	 * @return (partial) derivative of the network's error with respect to the input to this layer
 	 */
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv);
+	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final double learningRate);
 }

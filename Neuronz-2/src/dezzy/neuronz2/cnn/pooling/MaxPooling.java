@@ -1,6 +1,7 @@
 package dezzy.neuronz2.cnn.pooling;
 
 import dezzy.neuronz2.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Matrix.Index;
 
 /**
  * The max pooling operation.
@@ -10,12 +11,8 @@ import dezzy.neuronz2.math.constructs.Matrix;
 public final class MaxPooling implements PoolingOperation {
 
 	@Override
-	public final SliceResult condense(final Matrix matrix) {
-		final double[][] modified = new double[matrix.rows][matrix.cols];
-		
+	public final double condense(final Matrix matrix) {
 		double max = Double.NEGATIVE_INFINITY;
-		int maxRow = 0;
-		int maxCol = 0;
 		
 		for (int row = 0; row < matrix.rows; row++) {
 			for (int col = 0; col < matrix.cols; col++) {
@@ -23,14 +20,34 @@ public final class MaxPooling implements PoolingOperation {
 				
 				if (value > max) {
 					max = value;
-					maxRow = row;
-					maxCol = col;
 				}
 			}
 		}
 		
-		modified[maxRow][maxCol] = max;
-		return new SliceResult(max, new Matrix(modified));
+		return max;
 	}
 	
+	@Override
+	public final Matrix backprop(final Matrix latestInput, final Matrix derivative, final int rowStride, final int colStride) {
+		final double[][] out = new double[latestInput.rows][latestInput.cols];
+		
+		int rowIndex = 0;
+		int colIndex = 0;
+		
+		for (int smallRow = 0; smallRow < derivative.rows; smallRow++) {
+			for (int smallCol = 0; smallCol < derivative.cols; smallCol++) {
+				final Matrix window = latestInput.submatrix(rowIndex, colIndex, derivative.rows, derivative.cols);
+				
+				final Index max = window.max();
+				out[max.row][max.col] += derivative.get(smallRow, smallCol);
+				
+				colIndex += colStride;
+			}
+			
+			rowIndex += rowStride;
+			colIndex = 0;
+		}
+		
+		return new Matrix(out);
+	}	
 }
