@@ -58,4 +58,11 @@ public interface Layer<I extends ElementContainer<I>, O extends ElementContainer
 	 * @param learningRate learning rate used for gradient descent; not all layers need this
 	 */
 	public void update(final double learningRate);
+	
+	/**
+	 * Returns the total number of learnable parameters in this network.
+	 * 
+	 * @return number of learnable parameters in the network
+	 */
+	public int parameterCount();
 }

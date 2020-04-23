@@ -102,8 +102,16 @@ public class ConvFlattener implements Layer<Tensor3, Vector> {
 	 */
 	@Override
 	public void update(final double learningRate) {
-		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Returns zero because there are no learnable parameters in this layer.
+	 * 
+	 * @return zero
+	 */
+	@Override
+	public int parameterCount() {
+		return 0;
+	}	
 }

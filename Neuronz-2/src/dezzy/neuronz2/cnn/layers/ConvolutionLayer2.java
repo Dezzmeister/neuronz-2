@@ -223,4 +223,16 @@ public class ConvolutionLayer2 implements Layer<Tensor3, Tensor3> {
 		filterDeltas = null;
 		biasDeltas = null;
 	}
+	
+	/**
+	 * Returns the number of bias units plus the number of units in the filter tensor.
+	 * 
+	 * @return the total number of learnable parameters in this layer
+	 */
+	@Override
+	public int parameterCount() {
+		final Tensor3 t = filters.getTensor(0);
+		final Matrix m = t.getLayer(0);
+		return biases.dimension + (filters.dimension * t.dimension * m.rows * m.cols);
+	}
 }

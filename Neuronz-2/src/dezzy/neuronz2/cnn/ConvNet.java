@@ -71,4 +71,14 @@ public class ConvNet<I extends ElementContainer<I>, O extends ElementContainer<O
 		featureExtractor.update(learningRate);
 	}
 	
+	/**
+	 * Adds the total number of learnable parameters in the three component layers of this
+	 * convolutional neural network.
+	 * 
+	 * @return number of learnable parameters in this network
+	 */
+	@Override
+	public int parameterCount() {
+		return featureExtractor.parameterCount() + flattener.parameterCount() + classifier.parameterCount();
+	}
 }

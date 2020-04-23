@@ -100,4 +100,9 @@ public class DenseLayer implements Layer<Vector, Vector> {
 		biasDeltas = null;
 	}
 	
+	@Override
+	public int parameterCount() {
+		return bias.dimension + (weights.rows * weights.cols);
+	}
+	
 }

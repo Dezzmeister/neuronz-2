@@ -113,4 +113,14 @@ public class PoolingLayer implements Layer<Tensor3, Tensor3> {
 	public void update(final double learningRate) {
 		
 	}
+	
+	/**
+	 * Returns zero because there are no learnable parameters in this layer.
+	 * 
+	 * @return zero 
+	 */
+	@Override
+	public int parameterCount() {
+		return 0;
+	}
 }

@@ -87,4 +87,14 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 	public void update(final double learningRate) {
 		
 	}
+	
+	/**
+	 * Returns zero because there are no learnable parameters in this layer.
+	 * 
+	 * @return zero
+	 */
+	@Override
+	public int parameterCount() {
+		return 0;
+	}
 }

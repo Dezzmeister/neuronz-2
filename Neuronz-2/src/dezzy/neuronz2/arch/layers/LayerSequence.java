@@ -83,4 +83,21 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 			layers[i].update(learningRate);
 		}
 	}
+	
+	/**
+	 * Returns the number of learnable parameters in this layer sequence, which is the sum of all the learnable parameters
+	 * in the {@linkplain #layers layer array}.
+	 * 
+	 * @return total number of learnable parameters in this layer sequence
+	 */
+	@Override
+	public int parameterCount() {
+		int sum = 0;
+		
+		for (int i = 0; i < layers.length; i++) {
+			sum += layers[i].parameterCount();
+		}
+		
+		return sum;
+	}
 }

@@ -76,4 +76,13 @@ public class TensorActivationLayer<T extends ElementContainer<T>> implements Lay
 				
 	}
 	
+	/**
+	 * Returns zero because there are no learnable parameters in this layer.
+	 * 
+	 * @return zero
+	 */
+	@Override
+	public int parameterCount() {
+		return 0;
+	}
 }
