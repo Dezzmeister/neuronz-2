@@ -15,7 +15,7 @@ import dezzy.neuronz2.math.utility.DoubleApplier;
  *
  * @author Joe Desmond
  */
-public class ConvolutionLayer implements Layer<Tensor3, Tensor3> {
+public class ConvolutionLayer2 implements Layer<Tensor3, Tensor3> {
 	
 	/**
 	 * 
@@ -61,7 +61,7 @@ public class ConvolutionLayer implements Layer<Tensor3, Tensor3> {
 	 * @param _filters filters
 	 * @param _biases biases
 	 */
-	public ConvolutionLayer(final Tensor4 _filters, final Vector _biases) {
+	public ConvolutionLayer2(final Tensor4 _filters, final Vector _biases) {
 		filters = _filters;
 		biases = _biases;
 	}
@@ -219,5 +219,8 @@ public class ConvolutionLayer implements Layer<Tensor3, Tensor3> {
 		
 		filters = filters.minus(scaledFilterGradient);
 		biases = biases.minus(scaledBiasGradient);
+		
+		filterDeltas = null;
+		biasDeltas = null;
 	}
 }
