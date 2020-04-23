@@ -49,7 +49,7 @@ public interface Layer<I extends ElementContainer<I>, O extends ElementContainer
 	 * 			passed in (<code>errorOutputDeriv</code>)
 	 * @return (partial) derivative of the network's error with respect to the input to this layer
 	 */
-	public O backprop(final I errorOutputDeriv, final boolean isFirstLayer);
+	public I backprop(final O errorOutputDeriv, final boolean isFirstLayer);
 	
 	/**
 	 * Updates the weights of this layer, if there are any. Some layers (such as {@link PoolingLayer}) will not

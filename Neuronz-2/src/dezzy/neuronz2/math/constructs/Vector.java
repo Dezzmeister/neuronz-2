@@ -87,6 +87,20 @@ public final class Vector extends ElementContainer<Vector> {
 	}
 	
 	/**
+	 * Copies the components of this vector to a double array. Internally uses 
+	 * {@link System#arraycopy(src, srcPos, dest, destPos, length)}, where <code>src</code>
+	 * is this vector's components array.
+	 * 
+	 * @param srcIndex starting index (in this vector) to copy from
+	 * @param dest destination array
+	 * @param destIndex destination index (into <code>dest</code>) to copy to
+	 * @param length number of elements to copy
+	 */
+	public final void copyTo(final int srcIndex, final double[] dest, final int destIndex, final int length) {
+		System.arraycopy(components, srcIndex, dest, destIndex, length);
+	}
+	
+	/**
 	 * Calculates the length of this Vector using the Pythagorean Theorem.
 	 * 
 	 * @return the length of this Vector

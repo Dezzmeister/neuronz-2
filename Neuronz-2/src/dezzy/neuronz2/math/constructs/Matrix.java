@@ -130,6 +130,18 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	}
 	
 	/**
+	 * Copies the entire matrix row-wise into the given array.
+	 * 
+	 * @param array array to copy this matrix to
+	 * @param destIndex starting index in <code>array</code> to copy elements to
+	 */
+	public final void copyTo(final double[] array, final int destIndex) {
+		for (int row = 0; row < rows; row++) {
+			System.arraycopy(values[row], 0, array, destIndex + (row * cols), cols);
+		}
+	}
+	
+	/**
 	 * Multiplies this Matrix with another. Produces a matrix with the same number of rows as this matrix and {@link Matrix#rows other.cols} columns.
 	 * 
 	 * @param other other matrix to be multiplied
