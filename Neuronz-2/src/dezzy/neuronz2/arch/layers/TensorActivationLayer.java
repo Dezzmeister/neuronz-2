@@ -5,7 +5,7 @@ import dezzy.neuronz2.math.constructs.TensorFunction;
 
 /**
  * An activation layer using a tensor-valued activation function. Unlike {@link ElementActivationLayer}
- * the activation is not applied element-wise, it is applied to the entire input at once.
+ * the activation function is not applied element-wise, it is applied to the entire input at once.
  *
  * @author Joe Desmond
  * @param <T> tensor type (vector, matrix, etc.)
