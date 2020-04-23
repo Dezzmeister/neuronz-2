@@ -29,12 +29,12 @@ public class DenseLayer implements Layer<Vector, Vector> {
 	/**
 	 * Accumulated weight deltas, used in backpropagation
 	 */
-	private Matrix weightDeltas;
+	private Matrix weightDeltas = null;
 	
 	/**
 	 * Accumulated bias deltas, used in backpropagation
 	 */
-	private Vector biasDeltas;
+	private Vector biasDeltas = null;
 	
 	/**
 	 * The latest input to this layer

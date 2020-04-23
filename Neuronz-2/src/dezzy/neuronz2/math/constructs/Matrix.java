@@ -1,7 +1,5 @@
 package dezzy.neuronz2.math.constructs;
 
-import java.io.Serializable;
-
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
@@ -14,7 +12,7 @@ import dezzy.neuronz2.math.utility.IndexedGenerator;
  *
  * @author Joe Desmond
  */
-public final class Matrix extends ElementContainer<Matrix> implements Serializable {
+public final class Matrix extends ElementContainer<Matrix> {
 	/**
 	 * 
 	 */

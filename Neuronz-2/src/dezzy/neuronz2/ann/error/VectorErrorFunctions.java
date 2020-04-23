@@ -14,4 +14,9 @@ public class VectorErrorFunctions {
 	 * The cross entropy function and its derivative
 	 */
 	public static final CompleteErrorFunc<Vector> CROSS_ENTROPY = new CrossEntropy();
+	
+	/**
+	 * The mean square error function and its derivative
+	 */
+	public static final CompleteErrorFunc<Vector> MEAN_SQUARE_ERROR = new MeanSquareError();
 }

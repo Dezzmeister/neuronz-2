@@ -1,5 +1,7 @@
 package dezzy.neuronz2.math.constructs;
 
+import java.io.Serializable;
+
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
 
@@ -8,8 +10,13 @@ import dezzy.neuronz2.math.utility.DoubleOperator;
  *
  * @author Joe Desmond
  */
-public abstract class ElementContainer<T> {
+public abstract class ElementContainer<T> implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2655896537829731567L;
+
 	/**
 	 * Performs an operation with each element of <code>this</code> and <code>other</code>.
 	 * 

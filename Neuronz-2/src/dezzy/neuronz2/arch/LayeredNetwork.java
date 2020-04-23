@@ -1,5 +1,12 @@
 package dezzy.neuronz2.arch;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import dezzy.neuronz2.arch.error.CompleteErrorFunc;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.math.constructs.ElementContainer;
@@ -14,8 +21,13 @@ import dezzy.neuronz2.math.constructs.ElementContainer;
  * @param <I> input tensor type to the network (vector, matrix, etc.)
  * @param <O> output tensor type from the network (vector, matrix, etc.)
  */
-public class LayeredNetwork<I extends ElementContainer<I>, O extends ElementContainer<O>> {
+public class LayeredNetwork<I extends ElementContainer<I>, O extends ElementContainer<O>> implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3052043222705656121L;
+
 	/**
 	 * The actual network; can be either one layer or a 
 	 * {@linkplain dezzy.neuronz2.arch.layers.LayerSequence sequence of layers}
@@ -77,5 +89,36 @@ public class LayeredNetwork<I extends ElementContainer<I>, O extends ElementCont
 	 */
 	public final void update(final double learningRate) {
 		network.update(learningRate);
+	}
+	
+	/**
+	 * Saves this network to a file so that it can be run/trained later (with {@link #loadFrom}).
+	 * 
+	 * @param path path to file (will be created if it doesn't exist)
+	 * @throws IOException if there is a problem creating the {@link FileOutputStream} or {@link ObjectOutputStream}
+	 */
+	public final void saveAs(final String path) throws IOException {
+		final FileOutputStream fos = new FileOutputStream(path);
+		final ObjectOutputStream oos = new ObjectOutputStream(fos);
+		
+		oos.writeObject(this);
+		oos.close();
+	}
+	
+	/**
+	 * Loads a layered network from a file. Networks can be saved to a file with {@link #saveAs}.
+	 * 
+	 * @param path path to network file
+	 * @return a layered network loaded from <code>path</code>
+	 * @throws IOException if there is a problem creating the {@link FileInputStream} or {@link ObjectInputStream}
+	 * @throws ClassNotFoundException if the file at <code>path</code> does not contain a {@link LayeredNetwork}
+	 */
+	public static final LayeredNetwork<?,?> loadFrom(final String path) throws IOException, ClassNotFoundException {
+		final FileInputStream fis = new FileInputStream(path);
+		final ObjectInputStream ois = new ObjectInputStream(fis);
+		final LayeredNetwork<?,?> network = (LayeredNetwork<?,?>) ois.readObject();
+		
+		ois.close();
+		return network;
 	}
 }

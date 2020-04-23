@@ -1,5 +1,7 @@
 package dezzy.neuronz2.arch.layers;
 
+import java.util.List;
+
 import dezzy.neuronz2.math.constructs.ElementContainer;
 
 /**
@@ -22,7 +24,7 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 	/**
 	 * The layers in this sequence
 	 */
-	private final Layer<T, T>[] layers;
+	private final List<Layer<T, T>> layers;
 	
 	/**
 	 * Constructs a LayerSequence with the given layers. The layers are connected in the order
@@ -30,7 +32,7 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 	 * 
 	 * @param _layers sequence of layers
 	 */
-	public LayerSequence(final Layer<T, T>[] _layers) {
+	public LayerSequence(final List<Layer<T, T>> _layers) {
 		layers = _layers;
 	}
 	
@@ -44,8 +46,8 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 	public T forwardPass(final T prevActivations) {
 		T activations = prevActivations;
 		
-		for (int i = 0; i < layers.length; i++) {
-			activations = layers[i].forwardPass(activations);
+		for (int i = 0; i < layers.size(); i++) {
+			activations = layers.get(i).forwardPass(activations);
 		}
 		
 		return activations;
@@ -64,11 +66,11 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 	public T backprop(final T errorOutputDeriv, final boolean isFirstLayer) {
 		T derivative = errorOutputDeriv;
 		
-		for (int i = layers.length - 1; i <= 1; i--) {
-			derivative = layers[i].backprop(derivative, false);
+		for (int i = layers.size() - 1; i >= 1; i--) {
+			derivative = layers.get(i).backprop(derivative, false);
 		}
 		
-		return layers[0].backprop(derivative, isFirstLayer);
+		return layers.get(0).backprop(derivative, isFirstLayer);
 	}
 	
 	/**
@@ -79,14 +81,14 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 	 */
 	@Override
 	public void update(double learningRate) {
-		for (int i = 0; i < layers.length; i++) {
-			layers[i].update(learningRate);
+		for (int i = 0; i < layers.size(); i++) {
+			layers.get(i).update(learningRate);
 		}
 	}
 	
 	/**
 	 * Returns the number of learnable parameters in this layer sequence, which is the sum of all the learnable parameters
-	 * in the {@linkplain #layers layer array}.
+	 * in the {@linkplain #layers layer list}.
 	 * 
 	 * @return total number of learnable parameters in this layer sequence
 	 */
@@ -94,8 +96,8 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 	public int parameterCount() {
 		int sum = 0;
 		
-		for (int i = 0; i < layers.length; i++) {
-			sum += layers[i].parameterCount();
+		for (int i = 0; i < layers.size(); i++) {
+			sum += layers.get(i).parameterCount();
 		}
 		
 		return sum;

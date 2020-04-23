@@ -12,6 +12,11 @@ import dezzy.neuronz2.math.utility.IndexedGenerator;
  */
 public final class Vector extends ElementContainer<Vector> {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4107315004380260571L;
+
+	/**
 	 * The components of the Vector, these should not change.
 	 */
 	private final double[] components;

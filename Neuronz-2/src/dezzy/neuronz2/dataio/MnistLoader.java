@@ -30,7 +30,7 @@ public final class MnistLoader {
 	 * @param imagePath path to image file
 	 * @return MNIST images
 	 */
-	public final static Vector[] loadImages(final String imagePath) {
+	public static final Vector[] loadImages(final String imagePath) {
 		Vector[] data = null;
 		
 		try {
@@ -107,7 +107,7 @@ public final class MnistLoader {
 	 * @param b3 fourth byte
 	 * @return (first + second + third + fourth), where + is a concatenation operator
 	 */
-	private static final int concatenateUnsignedBytes(final byte b0, final byte b1, final byte b2, final byte b3) {
+	static final int concatenateUnsignedBytes(final byte b0, final byte b1, final byte b2, final byte b3) {
 		return (unsigned(b0) << 24) | (unsigned(b1) << 16) | (unsigned(b2) << 8) | unsigned(b3);
 	}
 	
@@ -117,7 +117,7 @@ public final class MnistLoader {
 	 * @param b byte
 	 * @return int
 	 */
-	private static final int unsigned(final byte b) {
+	static final int unsigned(final byte b) {
 		return b & 0xFF;
 	}
 }
