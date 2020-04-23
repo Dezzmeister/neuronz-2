@@ -5,6 +5,7 @@ import java.io.Serializable;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.utility.IndexedGenerator;
 
 
 
@@ -63,6 +64,31 @@ public final class Tensor3 extends ElementContainer<Tensor3> implements Serializ
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Generates a tensor with the specified size using the given generator function. Calls
+	 * {@link IndexedGenerator#generate(int...) generator.generate(layer, row, col)} with every element's layer, row, and column
+	 * to obtain the values of the tensor.
+	 * 
+	 * @param generator generator function, used to generate components of the tensor
+	 * @param layers number of layers (matrices) in the tensor
+	 * @param rows number of rows in each layer
+	 * @param cols number of columns in each row
+	 * @return a new rank 3 tensor
+	 */
+	public static Tensor3 generate(final IndexedGenerator generator, final int layers, final int rows, final int cols) {
+		final double[][][] out = new double[layers][rows][cols];
+		
+		for (int layer = 0; layer < layers; layer++) {
+			for (int row = 0; row < rows; row++) {
+				for (int col = 0; col < cols; col++) {
+					out[layer][row][col] = generator.generate(layer, row, col);
+				}
+			}
+		}
+		
+		return new Tensor3(out);
 	}
 	
 	/**

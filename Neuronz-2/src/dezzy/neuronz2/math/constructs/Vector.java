@@ -3,6 +3,7 @@ package dezzy.neuronz2.math.constructs;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.utility.IndexedGenerator;
 
 /**
  * Represents a Vector with any number of elements.
@@ -34,6 +35,25 @@ public final class Vector extends ElementContainer<Vector> {
 		components = _components;
 		dimension = components.length;
 		length = calculateLength();
+	}
+	
+	/**
+	 * Generates a vector with the specified length using the given generator function. Calls
+	 * {@link IndexedGenerator#generate(int...) generator.generate(i)} with every component index
+	 * to obtain the values of the vector.
+	 * 
+	 * @param generator generator function, used to generate components of the vector
+	 * @param length number of components in the vector
+	 * @return a new vector
+	 */
+	public static Vector generate(final IndexedGenerator generator, final int length) {
+		final double[] out = new double[length];
+		
+		for (int i = 0; i < length; i++) {
+			out[i] = generator.generate(i);
+		}
+		
+		return new Vector(out);
 	}
 	
 	/**

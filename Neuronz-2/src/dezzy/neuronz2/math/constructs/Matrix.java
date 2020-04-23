@@ -6,6 +6,7 @@ import dezzy.neuronz2.cnn.pooling.PoolingOperation;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
+import dezzy.neuronz2.math.utility.IndexedGenerator;
 
 
 /**
@@ -88,6 +89,28 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 		}
 		
 		cols = tempCols;
+	}
+	
+	/**
+	 * Generates a matrix with the specified size using the given generator function. Calls
+	 * {@link IndexedGenerator#generate(int...) generator.generate(row, col)} with every element's row, and column
+	 * to obtain the values of the matrix.
+	 * 
+	 * @param generator generator function, used to generate components of the matrix
+	 * @param rows number of rows in the matrix
+	 * @param cols number of columns in the matrix
+	 * @return a new matrix
+	 */
+	public static final Matrix generate(final IndexedGenerator generator, final int rows, final int cols) {
+		final double[][] out = new double[rows][cols];
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				out[row][col] = generator.generate(row, col);
+			}
+		}
+		
+		return new Matrix(out);
 	}
 	
 	/**
