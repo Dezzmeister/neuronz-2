@@ -12,6 +12,11 @@ import dezzy.neuronz2.math.constructs.Tensor3;
 public class ActivationLayer implements Layer {
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8370778816266631023L;
+
+	/**
 	 * The activation function and its derivative
 	 */
 	private final FuncDerivPair activationFunction;
@@ -51,13 +56,23 @@ public class ActivationLayer implements Layer {
 	 * element-wise with the given derivative (chain rule), and returns this new derivative.
 	 * 
 	 * @param errorOutputDeriv derivative of the network error with respect to this layer's output
-	 * @param learningRate unused
+	 * @param isFirstLayer unused
 	 * @return derivative of the network error with respect to this layer's input
 	 */
 	@Override
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final double learningRate) {
+	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final boolean isFirstLayer) {
 		final Tensor3 outputInputDeriv = latestInput.transform(activationFunction.derivative);
 		
 		return errorOutputDeriv.hadamard(outputInputDeriv);
+	}
+	
+	/**
+	 * Not implemented: there are no weights in this layer.
+	 * 
+	 * @param learningRate unused
+	 */
+	@Override
+	public void update(final double learningRate) {
+		
 	}
 }

@@ -12,6 +12,11 @@ import dezzy.neuronz2.math.constructs.Tensor3;
 public class PoolingLayer implements Layer {
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8305938005765678674L;
+
+	/**
 	 * The pooling operation
 	 */
 	private final PoolingOperation poolingOperation;
@@ -81,11 +86,11 @@ public class PoolingLayer implements Layer {
 	 * {@link PoolingOperation#backprop(Matrix, Matrix, int, int) poolingOperation.backprop()}.
 	 * 
 	 * @param errorOutputDeriv the (partial) derivative of the network error with respect to the output of this layer
-	 * @param learningRate unused
+	 * @param isFirstLayer unused
 	 * @return the (partial) derivative of the network error with respect to the input to this layer
 	 */
 	@Override
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final double learningRate) {
+	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final boolean isFirstLayer) {
 		final Matrix[] errorInputDeriv = new Matrix[errorOutputDeriv.dimension];
 		
 		for (int m = 0; m < errorOutputDeriv.dimension; m++) {
@@ -96,5 +101,15 @@ public class PoolingLayer implements Layer {
 		}
 		
 		return new Tensor3(errorInputDeriv);
-	}	
+	}
+	
+	/**
+	 * Not implemented: there are no weights in this layer.
+	 * 
+	 * @param learningRate unused
+	 */
+	@Override
+	public void update(final double learningRate) {
+		
+	}
 }

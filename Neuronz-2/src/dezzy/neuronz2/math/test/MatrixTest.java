@@ -100,6 +100,6 @@ public final class MatrixTest {
 		System.out.println(image.convolve(kernel, 1, d -> d));
 		
 		System.out.println("\nMax Pooling:");
-		System.out.println(image.poolingTransform(3, 3, 1, 1, PoolingOperation.MAX_POOLING).result);
+		System.out.println(image.poolingTransform(3, 3, 1, 1, PoolingOperation.MAX_POOLING));
 	}
 }

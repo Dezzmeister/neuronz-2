@@ -258,42 +258,43 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	
 	/**
 	 * Pads this matrix with a constant value, giving a larger matrix with the padding. The new matrix has a size of
-	 * ({@link #rows} + <code>(padWidth * 2)</code>) by ({@link #cols} + <code>(padWidth * 2</code>). A copy of the values
+	 * ({@link #rows} + <code>(padRows * 2)</code>) by ({@link #cols} + <code>(padCols * 2</code>). A copy of the values
 	 * in the current matrix is centered in the new matrix.
 	 * 
-	 * @param padWidth width of the padding
+	 * @param padRows number of rows to pad with (padding at top and bottom of matrix)
+	 * @param padCols number of columns to pad with (padding at left and right of matrix)
 	 * @param value value of each padded location
 	 * @return a version of this matrix with padding added
 	 */
-	public final Matrix pad(final int padWidth, final double value) {
-		final double[][] out = new double[rows + (2 * padWidth)][cols + (2 * padWidth)];
+	public final Matrix pad(final int padRows, final int padCols, final double value) {
+		final double[][] out = new double[rows + (2 * padRows)][cols + (2 * padCols)];
 		
-		for (int row = 0; row < padWidth; row++) {
+		for (int row = 0; row < padRows; row++) {
 			for (int col = 0; col < out[0].length; col++) {
 				out[row][col] = value;
 			}
 		}
 		
-		for (int row = rows + padWidth; row < out.length; row++) {
+		for (int row = rows + padRows; row < out.length; row++) {
 			for (int col = 0; col < out[0].length; col++) {
 				out[row][col] = value;
 			}
 		}
 		
-		for (int col = 0; col < padWidth; col++) {
-			for (int row = padWidth; row < rows + padWidth; row++) {
+		for (int col = 0; col < padCols; col++) {
+			for (int row = padRows; row < rows + padRows; row++) {
 				out[row][col] = value;
 			}
 		}
 		
-		for (int col = cols + padWidth; col < out[0].length; col++) {
-			for (int row = padWidth; row < rows + padWidth; row++) {
+		for (int col = cols + padCols; col < out[0].length; col++) {
+			for (int row = padRows; row < rows + padRows; row++) {
 				out[row][col] = value;
 			}
 		}
 		
-		for (int row = padWidth; row < rows + padWidth; row++) {
-			System.arraycopy(values[row], 0, out[row], padWidth, values[0].length);
+		for (int row = padRows; row < rows + padRows; row++) {
+			System.arraycopy(values[row], 0, out[row], padCols, values[0].length);
 		}
 		
 		return new Matrix(out);
@@ -301,21 +302,92 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 	
 	/**
 	 * Pads this matrix with zeroes. Functionally equivalent to calling 
-	 * {@link #pad(int, double) pad(padWidth, 0.0)}. The difference between the two
+	 * {@link #pad(int, double) pad(padRows, padCols, 0.0)}. The difference between the two
 	 * is that this exploits the fact that arrays are initially zeroed, making it faster than a call to
-	 * {@link #pad(int, double) pad(padWidth, 0.0)}.
+	 * {@link #pad(int, double) pad(padRows, padCols, 0.0)}.
 	 * 
-	 * @param padWidth width of the padding
-	 * @return a version of this matrix with padding added
+	 * @param padRows number of rows to pad with (padding at top and bottom of matrix)
+	 * @param padCols number of columns to pad with (padding at left and right of matrix)
+	 * @return a version of this matrix with padding added (zeroes)
 	 */
-	public final Matrix padZero(final int padWidth) {
-		final double[][] out = new double[rows + (2 * padWidth)][cols + (2 * padWidth)];
+	public final Matrix padZero(final int padRows, final int padCols) {
+		final double[][] out = new double[rows + (2 * padRows)][cols + (2 * padCols)];
 		
-		for (int row = padWidth; row < rows + padWidth; row++) {
-			System.arraycopy(values[row], 0, out[row], padWidth, values[0].length);
+		for (int row = padRows; row < rows + padRows; row++) {
+			System.arraycopy(values[row], 0, out[row], padCols, values[0].length);
 		}
 		
 		return new Matrix(out);
+	}
+	
+	/**
+	 * Flips a matrix horizontally: mirrors elements over a horizontal line splitting the matrix
+	 * into two equal parts.
+	 * 
+	 * @return a version of this matrix flipped horizontally
+	 */
+	public final Matrix flipHorizontal() {
+		final double[][] out = new double[rows][cols];
+		
+		for (int row = 0; row < rows; row++) {
+			System.arraycopy(values[row], 0, out[rows - row], 0, cols);
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Flips a matrix vertically: mirrors elements over a vertical line splitting the matrix
+	 * into two equal parts.
+	 * 
+	 * @return a version of this matrix flipped vertically
+	 */
+	public final Matrix flipVertical() {
+		final double[][] out = new double[rows][cols];
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				out[row][col] = values[row][cols - col];
+			}
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Rotates this matrix by 180 degrees. Functionally equivalent to calling {@link #flipHorizontal()} 
+	 * followed by {@link #flipVertical()}, or vice versa. The difference is that this function is faster because
+	 * it requires half the memory allocations.
+	 * 
+	 * @return a version of this matrix rotates by 180 degrees
+	 */
+	public final Matrix rotate180() {
+		final double[][] out = new double[rows][cols];
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				out[row][col] = values[rows - row][cols - col];
+			}
+		}
+		
+		return new Matrix(out);
+	}
+	
+	/**
+	 * Returns the sum of every element in this matrix.
+	 * 
+	 * @return sum of every element in this matrix
+	 */
+	public final double sum() {
+		double sum = 0;
+		
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				sum += values[row][col];
+			}
+		}
+		
+		return sum;
 	}
 	
 	/**
