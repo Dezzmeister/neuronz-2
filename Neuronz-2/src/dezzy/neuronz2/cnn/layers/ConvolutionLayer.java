@@ -102,7 +102,7 @@ public class ConvolutionLayer implements Layer {
 	 * <li>Pads the layers in <code>errorOutputDeriv</code>, so that a full convolution can be performed and the result
 	 * of this convolution will have the same size as the input tensor.</li>
 	 * <li>Computes the derivative of the error with respect to this layer's input. For each channel, every layer of 
-	 * the padded <code>errorOutputDeriv</code> is convolved with the channel layer in it's corresponding filter.
+	 * the padded <code>errorOutputDeriv</code> is convolved with the channel layer (rotated 180 degrees) in it's corresponding filter.
 	 * The derivative of the error with respect to the layer's input for the channel is given by summing
 	 * the results of these convolutions.
 	 * </ol>
@@ -177,7 +177,7 @@ public class ConvolutionLayer implements Layer {
 			
 			for (int filterIndex = 0; filterIndex < filters.dimension; filterIndex++) {
 				final Matrix derivative = paddedDerivatives[filterIndex];
-				final Matrix filter = filters.getTensor(filterIndex).getLayer(channel);
+				final Matrix filter = filters.getTensor(filterIndex).getLayer(channel).rotate180();
 				
 				final Matrix convolved = derivative.convolve(filter, 1, NON_MODIFIER);
 				
