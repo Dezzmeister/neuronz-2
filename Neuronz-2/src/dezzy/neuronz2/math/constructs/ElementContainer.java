@@ -4,7 +4,7 @@ import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
 
 /**
- * Represents anything that contains a collection of double elements.
+ * Represents anything that contains a collection of <code>double</code> elements.
  *
  * @author Joe Desmond
  */

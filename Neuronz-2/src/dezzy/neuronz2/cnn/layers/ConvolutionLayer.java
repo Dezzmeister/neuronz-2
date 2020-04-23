@@ -1,5 +1,6 @@
 package dezzy.neuronz2.cnn.layers;
 
+import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
 import dezzy.neuronz2.math.constructs.Tensor4;
@@ -14,7 +15,7 @@ import dezzy.neuronz2.math.utility.DoubleApplier;
  *
  * @author Joe Desmond
  */
-public class ConvolutionLayer implements Layer {
+public class ConvolutionLayer implements Layer<Tensor3, Tensor3> {
 	
 	/**
 	 * 
@@ -43,7 +44,7 @@ public class ConvolutionLayer implements Layer {
 	private Vector biasDeltas;
 	
 	/**
-	 * The latest input to this layer (latest input to {@link #activations(Tensor3)},
+	 * The latest input to this layer (latest input to {@link #forwardPass(Tensor3)},
 	 * used in backpropagation
 	 */
 	private Tensor3 latestInput;
@@ -53,6 +54,17 @@ public class ConvolutionLayer implements Layer {
 	 * requires a functional parameter
 	 */
 	private static final DoubleApplier NON_MODIFIER = d -> d;
+	
+	/**
+	 * Constructs a convolutional layer with the given initial filters and biases.
+	 * 
+	 * @param _filters filters
+	 * @param _biases biases
+	 */
+	public ConvolutionLayer(final Tensor4 _filters, final Vector _biases) {
+		filters = _filters;
+		biases = _biases;
+	}
 	
 	/**
 	 * Convolves the given tensor with each filter (in {@link #filters}) and takes the first layer
@@ -67,7 +79,7 @@ public class ConvolutionLayer implements Layer {
 	 * @return output of this layer
 	 */
 	@Override
-	public Tensor3 activations(final Tensor3 prevActivations) {
+	public Tensor3 forwardPass(final Tensor3 prevActivations) {
 		latestInput = prevActivations;
 		
 		final Matrix[] output = new Matrix[filters.dimension];

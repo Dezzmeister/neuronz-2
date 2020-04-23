@@ -1,5 +1,6 @@
 package dezzy.neuronz2.cnn.layers;
 
+import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
@@ -9,7 +10,7 @@ import dezzy.neuronz2.math.constructs.Tensor3;
  *
  * @author Joe Desmond
  */
-public class PoolingLayer implements Layer {
+public class PoolingLayer implements Layer<Tensor3, Tensor3> {
 	
 	/**
 	 * 
@@ -69,7 +70,7 @@ public class PoolingLayer implements Layer {
 	 * @return output of this network layer
 	 */
 	@Override
-	public Tensor3 activations(final Tensor3 prevActivations) {
+	public Tensor3 forwardPass(final Tensor3 prevActivations) {
 		final Matrix[] output = new Matrix[prevActivations.dimension];
 		
 		for (int i = 0; i < prevActivations.dimension; i++) {
@@ -97,7 +98,7 @@ public class PoolingLayer implements Layer {
 			final Matrix pooled = errorOutputDeriv.getLayer(m);
 			final Matrix input = latestInput.getLayer(m);
 			
-			errorInputDeriv[m] = poolingOperation.backprop(input, pooled, rowStride, colStride);
+			errorInputDeriv[m] = poolingOperation.backprop(input, pooled, windowRows, windowCols, rowStride, colStride);
 		}
 		
 		return new Tensor3(errorInputDeriv);

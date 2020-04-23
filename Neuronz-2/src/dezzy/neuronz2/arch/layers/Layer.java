@@ -1,24 +1,28 @@
-package dezzy.neuronz2.cnn.layers;
+package dezzy.neuronz2.arch.layers;
 
 import java.io.Serializable;
 
-import dezzy.neuronz2.math.constructs.Tensor3;
+import dezzy.neuronz2.cnn.layers.PoolingLayer;
+import dezzy.neuronz2.math.constructs.ElementContainer;
 
 /**
- * A single layer in a convolutional neural network.
+ * A single layer in a neural network and the building block of large neural networks.
  *
  * @author Joe Desmond
+ * @param <I> The input to this layer (examples: may be a {@linkplain dezzy.neuronz2.math.constructs.Matrix matrix},
+ * 			{@linkplain dezzy.neuronz2.math.constructs.Tensor3 rank 3 tensor}, etc.)
+ * @param <O> The output of this layer
  */
-public interface Layer extends Serializable {
+public interface Layer<I extends ElementContainer<I>, O extends ElementContainer<O>> extends Serializable {
 	
 	/**
 	 * Get the activations for this layer (the result of forward propagation of the previous activations).
-	 * This function may return a tensor with a different shape than the input tensor.
+	 * This function may return a result with a different shape than the input.
 	 * 
 	 * @param prevActivations previous activations (output of the previous layer)
 	 * @return output of this layer
 	 */
-	public Tensor3 activations(final Tensor3 prevActivations);
+	public O forwardPass(final I prevActivations);
 	
 	/**
 	 * Propagates the error through this layer. This function should change the state of the layer if it needs to:
@@ -29,7 +33,7 @@ public interface Layer extends Serializable {
 	 * <p>
 	 * This function takes as input the derivative of the network's error with respect to the output of this layer,
 	 * and returns the derivative of the network's error with respect to the output of the previous layer. This
-	 * function may return a tensor with a different shape than the input tensor.
+	 * function may return a result with a different shape than the input.
 	 * <p>
 	 * The <code>isFirstLayer</code> flag implements a performance optimization by skipping gradient calculation for the first layer
 	 * in a network. This flag does not have to be set to true when calling this function on the first layer;
@@ -45,7 +49,7 @@ public interface Layer extends Serializable {
 	 * 			passed in (<code>errorOutputDeriv</code>)
 	 * @return (partial) derivative of the network's error with respect to the input to this layer
 	 */
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final boolean isFirstLayer);
+	public O backprop(final I errorOutputDeriv, final boolean isFirstLayer);
 	
 	/**
 	 * Updates the weights of this layer, if there are any. Some layers (such as {@link PoolingLayer}) will not

@@ -28,7 +28,7 @@ public final class MaxPooling implements PoolingOperation {
 	}
 	
 	@Override
-	public final Matrix backprop(final Matrix latestInput, final Matrix derivative, final int rowStride, final int colStride) {
+	public final Matrix backprop(final Matrix latestInput, final Matrix derivative, final int windowRows, final int windowCols, final int rowStride, final int colStride) {
 		final double[][] out = new double[latestInput.rows][latestInput.cols];
 		
 		int rowIndex = 0;
@@ -36,10 +36,10 @@ public final class MaxPooling implements PoolingOperation {
 		
 		for (int smallRow = 0; smallRow < derivative.rows; smallRow++) {
 			for (int smallCol = 0; smallCol < derivative.cols; smallCol++) {
-				final Matrix window = latestInput.submatrix(rowIndex, colIndex, derivative.rows, derivative.cols);
+				final Matrix window = latestInput.submatrix(rowIndex, colIndex, windowRows, windowCols);
 				
 				final Index max = window.max();
-				out[max.row][max.col] += derivative.get(smallRow, smallCol);
+				out[rowIndex + max.row][colIndex + max.col] += derivative.get(smallRow, smallCol);
 				
 				colIndex += colStride;
 			}

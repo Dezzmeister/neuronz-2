@@ -34,10 +34,12 @@ public interface PoolingOperation {
 	 * @param latestInput latest input to {@link #condense()}
 	 * @param derivative partial derivative of the error of a network with respect to the output of 
 	 * 			{@link #condense(Matrix) condense(latestInput)}
+	 * @param windowRows number of rows in pooling window
+	 * @param windowCols number of columns in pooling window
 	 * @param rowStride row stride
 	 * @param colStride column stride
 	 * @return partial derivative of the error of a network with respect to <code>latestInput</code>
 	 * 			(use the chain rule with <code>derivative</code>)
 	 */
-	public Matrix backprop(final Matrix latestInput, final Matrix derivative, final int rowStride, final int colStride);
+	public Matrix backprop(final Matrix latestInput, final Matrix derivative, final int windowRows, final int windowCols, final int rowStride, final int colStride);
 }

@@ -1,15 +1,15 @@
-package dezzy.neuronz2.cnn.layers;
+package dezzy.neuronz2.arch.layers;
 
+import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.FuncDerivPair;
-import dezzy.neuronz2.math.constructs.Tensor3;
 
 /**
- * An activation layer in a convolutional neural network, applies an activation function
- * element-wise to every feature map.
+ * An activation layer in a neural network, applies an activation function
+ * element-wise to the input.
  *
  * @author Joe Desmond
  */
-public class ActivationLayer implements Layer {
+public class ElementActivationLayer<T extends ElementContainer<T>> implements Layer<T, T> {
 	
 	/**
 	 * 
@@ -24,14 +24,14 @@ public class ActivationLayer implements Layer {
 	/**
 	 * The latest input of this layer. Used in backpropagation
 	 */
-	private Tensor3 latestInput;
+	private T latestInput;
 	
 	/**
 	 * Constructs the activation layer given an activation function and its derivative.
 	 * 
 	 * @param _activationFunction the activation function and its derivative
 	 */
-	public ActivationLayer(final FuncDerivPair _activationFunction) {
+	public ElementActivationLayer(final FuncDerivPair _activationFunction) {
 		activationFunction = _activationFunction;
 	}
 	
@@ -44,7 +44,7 @@ public class ActivationLayer implements Layer {
 	 * @return output from this layer
 	 */
 	@Override
-	public Tensor3 activations(final Tensor3 prevActivations) {
+	public T forwardPass(final T prevActivations) {
 		latestInput = prevActivations;
 		return prevActivations.transform(activationFunction.function);
 	}
@@ -60,8 +60,8 @@ public class ActivationLayer implements Layer {
 	 * @return derivative of the network error with respect to this layer's input
 	 */
 	@Override
-	public Tensor3 backprop(final Tensor3 errorOutputDeriv, final boolean isFirstLayer) {
-		final Tensor3 outputInputDeriv = latestInput.transform(activationFunction.derivative);
+	public T backprop(final T errorOutputDeriv, final boolean isFirstLayer) {
+		final T outputInputDeriv = latestInput.transform(activationFunction.derivative);
 		
 		return errorOutputDeriv.hadamard(outputInputDeriv);
 	}

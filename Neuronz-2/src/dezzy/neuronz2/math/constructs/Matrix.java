@@ -294,7 +294,7 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 		}
 		
 		for (int row = padRows; row < rows + padRows; row++) {
-			System.arraycopy(values[row], 0, out[row], padCols, values[0].length);
+			System.arraycopy(values[row - padRows], 0, out[row], padCols, values[0].length);
 		}
 		
 		return new Matrix(out);
@@ -314,7 +314,7 @@ public final class Matrix extends ElementContainer<Matrix> implements Serializab
 		final double[][] out = new double[rows + (2 * padRows)][cols + (2 * padCols)];
 		
 		for (int row = padRows; row < rows + padRows; row++) {
-			System.arraycopy(values[row], 0, out[row], padCols, values[0].length);
+			System.arraycopy(values[row - padRows], 0, out[row], padCols, values[0].length);
 		}
 		
 		return new Matrix(out);
