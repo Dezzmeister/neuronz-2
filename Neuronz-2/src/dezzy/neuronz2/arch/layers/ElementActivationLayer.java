@@ -23,9 +23,17 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 	private final FuncDerivPair activationFunction;
 	
 	/**
-	 * The latest input of this layer. Used in backpropagation
+	 * The latest input to this layer. May be used in backpropagation
+	 * 
+	 * TODO: Implement this
 	 */
+	@SuppressWarnings("unused")
 	private T latestInput;
+	
+	/**
+	 * The latest output of this layer. Used in backpropagation
+	 */
+	private T latestOutput;
 	
 	/**
 	 * Constructs the activation layer given an activation function and its derivative.
@@ -38,8 +46,10 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 	
 	/**
 	 * Applies {@linkplain #activationFunction this} activation function element-wise to
-	 * <code>prevActivations</code>. Saves <code>prevActivations</code> internally for backpropagation, 
-	 * and returns the application of the activation function to the input.
+	 * <code>prevActivations</code>. Saves the application of the activation function internally
+	 * as well as the input to the function (for backpropagation). Returns the application
+	 * of the activation function on <code>prevActivations</code>.
+	 * 
 	 * 
 	 * @param prevActivations output from the previous layer
 	 * @return output from this layer
@@ -47,7 +57,8 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 	@Override
 	public T forwardPass(final T prevActivations) {
 		latestInput = prevActivations;
-		return prevActivations.transform(activationFunction.function);
+		latestOutput = prevActivations.transform(activationFunction.function);
+		return latestOutput;
 	}
 
 	/**
@@ -62,7 +73,7 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 	 */
 	@Override
 	public T backprop(final T errorOutputDeriv, final boolean isFirstLayer) {
-		final T outputInputDeriv = latestInput.transform(activationFunction.derivative);
+		final T outputInputDeriv = latestOutput.transform(activationFunction.derivative);
 		
 		return errorOutputDeriv.hadamard(outputInputDeriv);
 	}

@@ -181,6 +181,21 @@ public final class Vector extends ElementContainer<Vector> {
 	}
 	
 	/**
+	 * Sums the components of this vector and returns the result.
+	 * 
+	 * @return the sum of every component in this vector
+	 */
+	public final double sum() {
+		double sum = 0;
+		
+		for (int i = 0; i < components.length; i++) {
+			sum += components[i];
+		}
+		
+		return sum;
+	}
+	
+	/**
 	 * Converts this Vector into an easily readable format.
 	 */
 	@Override
