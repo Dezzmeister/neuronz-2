@@ -8,6 +8,7 @@ import dezzy.neuronz2.math.constructs.FuncDerivPair;
  * element-wise to the input.
  *
  * @author Joe Desmond
+ * @param <T> type of the input to this activation layer (i.e.; matrix, vector, etc.)
  */
 public class ElementActivationLayer<T extends ElementContainer<T>> implements Layer<T, T> {
 	
