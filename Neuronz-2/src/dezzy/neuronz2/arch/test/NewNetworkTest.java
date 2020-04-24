@@ -15,6 +15,7 @@ import dezzy.neuronz2.math.constructs.FuncDerivPair;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Vector;
 import dezzy.neuronz2.math.utility.IndexedGenerator;
+import dezzy.neuronz2.math.utility.TensorApplier;
 
 /**
  * Some functions to test the new architecture, and ensure that neural networks built with layers
@@ -22,10 +23,34 @@ import dezzy.neuronz2.math.utility.IndexedGenerator;
  *
  * @author Joe Desmond
  */
+@SuppressWarnings("unused")
 public class NewNetworkTest {
 	
-	public static final void main(final String[] args) throws IOException {
-		andGateTest();
+	public static final void main(final String[] args) throws IOException, ClassNotFoundException {
+		//andGateTest();
+		lrnLoadTest();
+	}
+	
+	/**
+	 * Tries to load the "and-gate" network saved by {@link #andGateTest()} and test it
+	 * on some inputs.
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 */
+	private static final void lrnLoadTest() throws ClassNotFoundException, IOException {
+		final LayeredNetwork<Vector, Vector> andNetwork = LayeredNetwork.loadFrom("networks/new-arch-test/andgate.lrn");
+		final TensorApplier<Vector> func = v -> new Vector(Math.round(v.get(0)));
+		final Vector in0 = new Vector(0, 0);
+		final Vector in1 = new Vector(0, 1);
+		final Vector in2 = new Vector(1, 0);
+		final Vector in3 = new Vector(1, 1);
+		
+		final Vector[] inputs = {in0, in1, in2, in3};
+		
+		for (Vector in : inputs) {
+			final Vector out = andNetwork.network.forwardPass(in);
+			System.out.println(in + " -> " + func.apply(out).get(0) + "  (" + out.get(0) + ")");
+		}
 	}
 	
 	/**

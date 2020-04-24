@@ -32,7 +32,7 @@ public class LayeredNetwork<I extends ElementContainer<I>, O extends ElementCont
 	 * The actual network; can be either one layer or a 
 	 * {@linkplain dezzy.neuronz2.arch.layers.LayerSequence sequence of layers}
 	 */
-	private final Layer<I, O> network;
+	public final Layer<I, O> network;
 	
 	/**
 	 * The error/cost function and its derivative with respect to the network output
@@ -107,16 +107,22 @@ public class LayeredNetwork<I extends ElementContainer<I>, O extends ElementCont
 	
 	/**
 	 * Loads a layered network from a file. Networks can be saved to a file with {@link #saveAs}.
+	 * <p>
+	 * <b>WARNING:</b> Performs an unchecked cast from {@link Object} to 
+	 * {@link LayeredNetwork LayeredNetwork&ltI, O&gt}
 	 * 
+	 * @param <I> input type of layered network at <code>path</code>
+	 * @param <O> output type of layered network at <code>path</code>
 	 * @param path path to network file
 	 * @return a layered network loaded from <code>path</code>
 	 * @throws IOException if there is a problem creating the {@link FileInputStream} or {@link ObjectInputStream}
 	 * @throws ClassNotFoundException if the file at <code>path</code> does not contain a {@link LayeredNetwork}
 	 */
-	public static final LayeredNetwork<?,?> loadFrom(final String path) throws IOException, ClassNotFoundException {
+	public static final <I extends ElementContainer<I>, O extends ElementContainer<O>> LayeredNetwork<I,O> loadFrom(final String path) throws IOException, ClassNotFoundException {
 		final FileInputStream fis = new FileInputStream(path);
 		final ObjectInputStream ois = new ObjectInputStream(fis);
-		final LayeredNetwork<?,?> network = (LayeredNetwork<?,?>) ois.readObject();
+		@SuppressWarnings("unchecked")
+		final LayeredNetwork<I,O> network = (LayeredNetwork<I,O>) ois.readObject();
 		
 		ois.close();
 		return network;
