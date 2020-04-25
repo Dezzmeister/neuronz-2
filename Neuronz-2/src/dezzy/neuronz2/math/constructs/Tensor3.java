@@ -1,5 +1,6 @@
 package dezzy.neuronz2.math.constructs;
 
+import dezzy.neuronz2.math.constructs.shape.Tensor3Shape;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
@@ -37,6 +38,15 @@ public final class Tensor3 extends ElementContainer<Tensor3> {
 	public Tensor3(final Matrix ... _matrices) {
 		matrices = _matrices;
 		dimension = matrices.length;
+	}
+	
+	/**
+	 * Returns the shape of this tensor (number of layers, rows, and columns).
+	 * 
+	 * @return the shape of this tensor
+	 */
+	public Tensor3Shape shape() {
+		return new Tensor3Shape(dimension, matrices[0].rows, matrices[0].cols);
 	}
 	
 	/**

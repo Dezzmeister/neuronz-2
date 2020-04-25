@@ -1,6 +1,7 @@
 package dezzy.neuronz2.math.constructs;
 
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
+import dezzy.neuronz2.math.constructs.shape.MatrixShape;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
@@ -58,6 +59,15 @@ public final class Matrix extends ElementContainer<Matrix> {
 		}
 		
 		cols = tempCols;
+	}
+	
+	/**
+	 * Returns the shape of this matrix (number of rows and columns).
+	 * 
+	 * @return shape of this matrix
+	 */
+	public MatrixShape shape() {
+		return new MatrixShape(rows, cols);
 	}
 	
 	/**

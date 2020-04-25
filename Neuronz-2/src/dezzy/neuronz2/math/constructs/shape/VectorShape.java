@@ -29,5 +29,10 @@ public class VectorShape extends Shape<Vector> {
 	@Override
 	public Vector generate(final IndexedGenerator generator) {
 		return Vector.generate(generator, length);
-	}	
+	}
+	
+	@Override
+	public String toString() {
+		return length + "";
+	}
 }

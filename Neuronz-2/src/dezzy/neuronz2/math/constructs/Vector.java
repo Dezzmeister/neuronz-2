@@ -1,5 +1,6 @@
 package dezzy.neuronz2.math.constructs;
 
+import dezzy.neuronz2.math.constructs.shape.VectorShape;
 import dezzy.neuronz2.math.utility.DimensionMismatchException;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
@@ -40,6 +41,15 @@ public final class Vector extends ElementContainer<Vector> {
 		components = _components;
 		dimension = components.length;
 		length = calculateLength();
+	}
+	
+	/**
+	 * Returns the shape of this vector (the number of components in the vector).
+	 * 
+	 * @return shape of this vector
+	 */
+	public VectorShape shape() {
+		return new VectorShape(dimension);
 	}
 	
 	/**

@@ -33,6 +33,14 @@ public final class FuncDerivPair implements Serializable {
 	);
 	
 	/**
+	 * Leaky ReLU activation function, prevents neurons from dying
+	 */
+	public static final FuncDerivPair LEAKY_RELU = new FuncDerivPair(
+			x -> (x < 0) ? 0.01 * x : x,
+			relu -> (relu < 0) ? 0.01 : 1
+	);
+	
+	/**
 	 * The activation function
 	 */
 	public final DoubleApplier function;

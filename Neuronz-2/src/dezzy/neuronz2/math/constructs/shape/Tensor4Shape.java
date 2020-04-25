@@ -52,4 +52,8 @@ public final class Tensor4Shape extends Shape<Tensor4> {
 		return Tensor4.generate(generator, tensors, layers, rows, cols);
 	}
 	
+	@Override
+	public String toString() {
+		return "(" + tensors + ", " + layers + ", " + rows + ", " + cols + ")";
+	}
 }

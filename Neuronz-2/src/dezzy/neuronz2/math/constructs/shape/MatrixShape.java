@@ -37,4 +37,8 @@ public final class MatrixShape extends Shape<Matrix> {
 		return Matrix.generate(generator, rows, cols);
 	}
 	
+	@Override
+	public String toString() {
+		return "(" + rows + ", " + cols + ")";
+	}
 }

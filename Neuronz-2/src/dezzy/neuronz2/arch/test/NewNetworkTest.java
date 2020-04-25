@@ -17,6 +17,9 @@ import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.ElementActivationLayer;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.arch.layers.LayerSequence;
+import dezzy.neuronz2.cnn.layers.ConvolutionLayer2;
+import dezzy.neuronz2.cnn.layers.PoolingLayer;
+import dezzy.neuronz2.cnn.pooling.PoolingOperation;
 import dezzy.neuronz2.dataio.MnistConvLoader;
 import dezzy.neuronz2.dataio.MnistLoader;
 import dezzy.neuronz2.math.constructs.ElementContainer;
@@ -48,7 +51,29 @@ public class NewNetworkTest {
 		//lrnLoadTest();
 		//andGateTest2();
 		//mnistANNTest();
-		mnistANNSoftmaxTest();
+		//mnistANNSoftmaxTest();
+		leNetSizeTest();
+	}
+	
+	private static final void leNetSizeTest() {
+		final Random random = new Random();
+		
+		final ConvolutionLayer2 conv0 = ConvolutionLayer2.generate(random, WeightInitFunc.STANDARD_NORMAL_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 20, 1, 5, 5);
+		final ElementActivationLayer<Tensor3> relu0 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
+		final PoolingLayer maxpooling0 = new PoolingLayer(PoolingOperation.MAX_POOLING, 2, 2, 2, 2);
+		final ConvolutionLayer2 conv1 = ConvolutionLayer2.generate(random, WeightInitFunc.STANDARD_NORMAL_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 30, 20, 5, 5);
+		final ElementActivationLayer<Tensor3> relu1 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
+		final PoolingLayer maxpooling1 = new PoolingLayer(PoolingOperation.MAX_POOLING, 2, 2, 2, 2);
+		
+		final List<Layer<Tensor3, Tensor3>> layers = List.of(conv0, relu0, maxpooling0, conv1, relu1, maxpooling1);
+		
+		final Layer<Tensor3, Tensor3> testLayers = new LayerSequence<>(layers);
+		
+		final Tensor3 input = Tensor3.generate(i -> 0, 1, 28, 28);
+		
+		final Tensor3 output = testLayers.forwardPass(input);
+		
+		System.out.println(output.dimension);
 	}
 	
 	private static final void mnistCNNTest() throws IOException, DataFormatException {

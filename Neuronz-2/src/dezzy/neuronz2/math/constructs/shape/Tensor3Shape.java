@@ -45,4 +45,8 @@ public final class Tensor3Shape extends Shape<Tensor3> {
 		return Tensor3.generate(generator, layers, rows, cols);
 	}
 	
+	@Override
+	public String toString() {
+		return "(" + layers + ", " + rows + ", " + cols + ")";
+	}
 }
