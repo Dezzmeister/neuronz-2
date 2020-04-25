@@ -16,7 +16,7 @@ import dezzy.neuronz2.math.constructs.shape.Shape;
 public interface WeightInitFunc {
 	
 	/**
-	 * Kaiming iniialization (useful for ReLU)
+	 * Kaiming initialization (useful for ReLU)
 	 */
 	public static final WeightInitFunc KAIMING_INIT = new KaimingInitFunc();
 	
@@ -24,6 +24,16 @@ public interface WeightInitFunc {
 	 * Xavier initialization (useful for tanh and sigmoid)
 	 */
 	public static final WeightInitFunc XAVIER_INIT = new XavierInitFunc();
+	
+	/**
+	 * Initializes weights/biases to zero (useful for biases)
+	 */
+	public static final WeightInitFunc ZERO_INIT = new ZeroInitFunc();
+	
+	/**
+	 * Initializes weights/biases to a small random value (useful for biases)
+	 */
+	public static final WeightInitFunc SMALL_VALUE_INIT = new SmallValueInitFunc();
 	
 	/**
 	 * Accepts a desired tensor shape and generates a tensor with this shape. Accepts other hyperparameters,

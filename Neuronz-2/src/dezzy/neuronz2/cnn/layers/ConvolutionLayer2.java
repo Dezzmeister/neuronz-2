@@ -1,10 +1,15 @@
 package dezzy.neuronz2.cnn.layers;
 
+import java.util.Random;
+
+import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
 import dezzy.neuronz2.math.constructs.Tensor4;
 import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.shape.Tensor4Shape;
+import dezzy.neuronz2.math.constructs.shape.VectorShape;
 import dezzy.neuronz2.math.utility.DoubleApplier;
 
 /**
@@ -64,6 +69,32 @@ public class ConvolutionLayer2 implements Layer<Tensor3, Tensor3> {
 	public ConvolutionLayer2(final Tensor4 _filters, final Vector _biases) {
 		filters = _filters;
 		biases = _biases;
+	}
+	
+	/**
+	 * Generates a convolutional layer with the given hyperparameters and initializes the weights and biases using the given functions.
+	 * 
+	 * @param random random number generator
+	 * @param weightInitializer weight initialization function
+	 * @param biasInitializer bias initialization function
+	 * @param numFilters number of filters in the convolutional layer
+	 * @param filterLayers number of layers (matrices) in each filter
+	 * @param filterRows number of rows in each layer
+	 * @param filterCols number of columns in each layer
+	 * @return a new convolutional layer with weights and biases initialized
+	 */
+	public static ConvolutionLayer2 generate(final Random random, final WeightInitFunc weightInitializer, final WeightInitFunc biasInitializer, final int numFilters, final int filterLayers, final int filterRows, final int filterCols) {
+		final Tensor4Shape weightShape = new Tensor4Shape(numFilters, filterLayers, filterRows, filterCols);
+		final VectorShape biasShape = new VectorShape(numFilters);
+		
+		final int numInputs = filterRows * filterCols * filterLayers;
+		final int numOutputs = numInputs;
+		final int numWeights = filterRows * filterCols * filterLayers * numFilters;
+		
+		final Tensor4 weights = weightInitializer.initialize(random, weightShape, numInputs, numOutputs, numWeights);
+		final Vector biases = biasInitializer.initialize(random, biasShape, numInputs, numOutputs, numWeights);
+		
+		return new ConvolutionLayer2(weights, biases);
 	}
 	
 	/**

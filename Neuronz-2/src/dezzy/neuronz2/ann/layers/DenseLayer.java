@@ -1,8 +1,13 @@
 package dezzy.neuronz2.ann.layers;
 
+import java.util.Random;
+
+import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Vector;
+import dezzy.neuronz2.math.constructs.shape.MatrixShape;
+import dezzy.neuronz2.math.constructs.shape.VectorShape;
 
 /**
  * A dense (fully connected) layer in a neural network.
@@ -50,6 +55,27 @@ public class DenseLayer implements Layer<Vector, Vector> {
 	public DenseLayer(final Matrix _weights, final Vector _bias) {
 		weights = _weights;
 		bias = _bias;
+	}
+	
+	/**
+	 * Generates a dense layer from the given hyperparameters and initializer functions.
+	 * 
+	 * @param random random number generator
+	 * @param weightInitializer weight initialization function (for example; {@link WeightInitFunc#KAIMING_INIT})
+	 * @param biasInitializer bias initialization function
+	 * @param numInputs number of input neurons
+	 * @param numOutputs number of output neurons
+	 * @return a new fully connected layer with <code>numInputs</code> input neurons, <code>numOutputs</code> output neurons,
+	 * 		and initialized weights and biases
+	 */
+	public static final DenseLayer generate(final Random random, final WeightInitFunc weightInitializer, final WeightInitFunc biasInitializer, final int numInputs, final int numOutputs) {
+		final MatrixShape weightShape = new MatrixShape(numOutputs, numInputs);
+		final VectorShape biasShape = new VectorShape(numOutputs);
+		
+		final Matrix weights = weightInitializer.initialize(random, weightShape, numInputs, numOutputs, numInputs * numOutputs);
+		final Vector biases = biasInitializer.initialize(random, biasShape, numInputs, numOutputs, numInputs * numOutputs);
+		
+		return new DenseLayer(weights, biases);
 	}
 	
 	@Override
