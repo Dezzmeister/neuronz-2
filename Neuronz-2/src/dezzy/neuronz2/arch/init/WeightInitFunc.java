@@ -36,6 +36,11 @@ public interface WeightInitFunc {
 	public static final WeightInitFunc SMALL_VALUE_INIT = new SmallValueInitFunc();
 	
 	/**
+	 * Initializes weights/biases to random standard normal values (mean 0, variance 1)
+	 */
+	public static final WeightInitFunc STANDARD_NORMAL_INIT = new StandardNormalInitFunc();
+	
+	/**
 	 * Accepts a desired tensor shape and generates a tensor with this shape. Accepts other hyperparameters,
 	 * which can be used to modify the initial weights in some way (example: {@link KaimingInitFunc Kaiming Initialization}).
 	 * <p>

@@ -100,9 +100,6 @@ public final class NetworkTest {
 	private static final void mnistTest3() throws ClassNotFoundException, IOException {
 		final Vector[] inputImages = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
 		
-		for (int i = 0; i < inputImages.length; i++) {
-			inputImages[i] = inputImages[i];
-		}
 		
 		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
 		final Vector[] idealOutputs = new Vector[inputImages.length];
@@ -121,9 +118,6 @@ public final class NetworkTest {
 		
 		final Vector[] testImages = MnistLoader.loadImages("data/mnist/test-images.idx3-ubyte");
 		
-		for (int i = 0; i < testImages.length; i++) {
-			testImages[i] = testImages[i];
-		}
 		
 		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
 		final Vector[] idealTestOutputs = new Vector[testImages.length];
@@ -168,7 +162,7 @@ public final class NetworkTest {
 		
 		final NetworkRunner networkRunner = new NetworkRunner(network, inputImages, idealOutputs, testImages, idealTestOutputs, false);
 		try {
-			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-alt-2.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
+			networkRunner.run(30, 10, learningRateSchedule, evaluator, "networks/mnist/network-100h-50h-alt-3.ntwk2", ProcessingScheme.CPU_MULTITHREADED);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
