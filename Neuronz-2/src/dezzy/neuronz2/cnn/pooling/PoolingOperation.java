@@ -1,5 +1,7 @@
 package dezzy.neuronz2.cnn.pooling;
 
+import java.io.Serializable;
+
 import dezzy.neuronz2.math.constructs.Matrix;
 
 /**
@@ -8,7 +10,7 @@ import dezzy.neuronz2.math.constructs.Matrix;
  * @author Joe Desmond
  * @see PoolingResult#modifiedInput
  */
-public interface PoolingOperation {
+public interface PoolingOperation extends Serializable {
 	
 	/**
 	 * Implementation of max pooling

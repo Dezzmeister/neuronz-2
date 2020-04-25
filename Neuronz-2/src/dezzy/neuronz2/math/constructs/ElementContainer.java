@@ -60,7 +60,7 @@ public abstract class ElementContainer<T> implements Serializable {
 	 * @param other to be added to <code>this</code>
 	 * @return <code>(this + other)</code> for each element
 	 */
-	public final T plus(final T other) {
+	public T plus(final T other) {
 		return elementOperation(other, ADD);
 	}
 	
@@ -70,7 +70,7 @@ public abstract class ElementContainer<T> implements Serializable {
 	 * @param other to be subtracted from <code>this</code>
 	 * @return <code>(this - other)</code> for each element
 	 */
-	public final T minus(final T other) {
+	public T minus(final T other) {
 		return elementOperation(other, SUBTRACT);
 	}
 	
@@ -80,7 +80,7 @@ public abstract class ElementContainer<T> implements Serializable {
 	 * @param other to be multiplied to <code>this</code>, element-wise
 	 * @return <code>(this * other)</code> for each element
 	 */
-	public final T hadamard(final T other) {
+	public T hadamard(final T other) {
 		return elementOperation(other, MULTIPLY);
 	}
 	
@@ -90,7 +90,7 @@ public abstract class ElementContainer<T> implements Serializable {
 	 * @param other to be divided by
 	 * @return <code>(this / other)</code> for each element
 	 */
-	public final T elementDivide(final T other) {
+	public T elementDivide(final T other) {
 		return elementOperation(other, DIVIDE);
 	}
 	
@@ -101,7 +101,7 @@ public abstract class ElementContainer<T> implements Serializable {
 	 * @param value scale factor
 	 * @return new ElementContainer scaled by <code>value</code>
 	 */
-	public final T scale(final double value) {
+	public T scale(final double value) {
 		final DoubleApplier scaler = d -> d * value;
 		
 		return transform(scaler);

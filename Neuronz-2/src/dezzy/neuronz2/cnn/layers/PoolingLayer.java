@@ -79,6 +79,8 @@ public class PoolingLayer implements Layer<Tensor3, Tensor3> {
 			output[i] = result;
 		}
 		
+		latestInput = prevActivations;
+		
 		return new Tensor3(output);
 	}
 	

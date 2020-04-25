@@ -10,6 +10,11 @@ import dezzy.neuronz2.math.constructs.Matrix.Index;
  */
 public final class MaxPooling implements PoolingOperation {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 963285225884302662L;
+
 	@Override
 	public final double condense(final Matrix matrix) {
 		double max = Double.NEGATIVE_INFINITY;

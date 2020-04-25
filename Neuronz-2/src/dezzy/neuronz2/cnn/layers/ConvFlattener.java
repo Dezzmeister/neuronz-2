@@ -36,14 +36,14 @@ public class ConvFlattener implements Layer<Tensor3, Vector> {
 	/**
 	 * Creates a ConvFlattener expecting tensors of the given shape.
 	 * 
+	 * @param _inputLayers number of expected layers
 	 * @param _inputRows number of expected rows
 	 * @param _inputCols number of expected columns
-	 * @param _inputLayers number of expected layers
 	 */
-	public ConvFlattener(final int _inputRows, final int _inputCols, final int _inputLayers) {
+	public ConvFlattener(final int _inputLayers, final int _inputRows, final int _inputCols) {
+		inputLayers = _inputLayers;
 		inputRows = _inputRows;
 		inputCols = _inputCols;
-		inputLayers = _inputLayers;
 	}
 
 	/**

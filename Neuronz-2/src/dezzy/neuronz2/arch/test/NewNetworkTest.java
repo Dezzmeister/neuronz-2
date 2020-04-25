@@ -17,6 +17,8 @@ import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.ElementActivationLayer;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.arch.layers.LayerSequence;
+import dezzy.neuronz2.cnn.ConvNet;
+import dezzy.neuronz2.cnn.layers.ConvFlattener;
 import dezzy.neuronz2.cnn.layers.ConvolutionLayer2;
 import dezzy.neuronz2.cnn.layers.PoolingLayer;
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
@@ -45,14 +47,16 @@ public class NewNetworkTest {
 	 * @param args unused
 	 * @throws IOException if there is a problem saving/loading files
 	 * @throws ClassNotFoundException if there is a problem deserializing networks from files
+	 * @throws DataFormatException if the mnist data file does not have the correct format
 	 */
-	public static final void main(final String[] args) throws IOException, ClassNotFoundException {
+	public static final void main(final String[] args) throws IOException, ClassNotFoundException, DataFormatException {
 		//andGateTest();
 		//lrnLoadTest();
 		//andGateTest2();
 		//mnistANNTest();
 		//mnistANNSoftmaxTest();
-		leNetSizeTest();
+		//leNetSizeTest();
+		mnistCNNTest();
 	}
 	
 	private static final void leNetSizeTest() {
@@ -73,7 +77,7 @@ public class NewNetworkTest {
 		
 		final Tensor3 output = testLayers.forwardPass(input);
 		
-		System.out.println(output.dimension);
+		System.out.println(output.shape());
 	}
 	
 	private static final void mnistCNNTest() throws IOException, DataFormatException {
@@ -132,7 +136,84 @@ public class NewNetworkTest {
 		
 		final Random random = new Random();
 		
-		// TODO: finish this
+		final ConvolutionLayer2 conv0 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.ZERO_INIT, 20, 1, 5, 5);
+		final ElementActivationLayer<Tensor3> relu0 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
+		final PoolingLayer maxpooling0 = new PoolingLayer(PoolingOperation.MAX_POOLING, 2, 2, 2, 2);
+		final ConvolutionLayer2 conv1 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.ZERO_INIT, 30, 20, 5, 5);
+		final ElementActivationLayer<Tensor3> relu1 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
+		final PoolingLayer maxpooling1 = new PoolingLayer(PoolingOperation.MAX_POOLING, 2, 2, 2, 2);
+		
+		final List<Layer<Tensor3, Tensor3>> featureExtractorLayers = List.of(conv0, relu0, maxpooling0, conv1, relu1, maxpooling1);
+		final Layer<Tensor3, Tensor3> featureExtractor = new LayerSequence<>(featureExtractorLayers);
+		final Layer<Tensor3, Vector> flattener = new ConvFlattener(30, 4, 4);
+		
+		final DenseLayer fc0 = DenseLayer.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.ZERO_INIT, 480, 10);
+		final ElementActivationLayer<Vector> relu2 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
+		final DenseLayer fc1 = DenseLayer.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.ZERO_INIT, 10, 10);
+		final SoftmaxLayer softmax = new SoftmaxLayer();
+		
+		final List<Layer<Vector, Vector>> classifierLayers = List.of(fc0, relu2, fc1, softmax);
+		final Layer<Vector, Vector> classifier = new LayerSequence<>(classifierLayers);
+		
+		final ConvNet<Tensor3, Vector> convNetwork = new ConvNet<>(featureExtractor, flattener, classifier);
+		final LayeredNetwork<Tensor3, Vector> network = new LayeredNetwork<>(convNetwork, VectorErrorFunctions.CROSS_ENTROPY);
+		
+		System.out.println("Network initialized with " + convNetwork.parameterCount() + " learnable parameters");
+		
+		final int minibatchSize = 10;
+		final double learningRate = 2.0;
+		
+		for (int epoch = 0; epoch < 30; epoch++) {
+			//Collections.shuffle(Arrays.asList(trainingData));
+			
+			//Training images			
+			int index = 0;
+			while (index < 100) {
+				
+				for (int i = 0; i < minibatchSize; i++) {
+					final Tensor3 input = trainingData[index].input;
+					final Vector expectedOutput = trainingData[index].output;
+					
+					final ForwardPassResult<Vector> result = network.forwardPass(input, expectedOutput);
+					network.backprop(expectedOutput, result.actualOutput, result.error);
+					
+					index++;
+				}
+				System.out.println(index);
+				
+				network.update(learningRate / minibatchSize);
+			}
+			
+			//Test images
+			int correct = 0;
+			for (int i = 0; i < 100; i++) {
+				final Tensor3 input = trainingData[i].input;
+				final Vector expectedOutput = trainingData[i].output;
+				
+				final ForwardPassResult<Vector> result = network.forwardPass(input, expectedOutput);
+				final Vector actual = result.actualOutput;
+								
+				int greatestIndex = 0;
+				double greatestValue = 0;
+				
+				for (int j = 0; j < 10; j++) {
+					double currentValue = actual.get(j);
+					
+					if (currentValue > greatestValue) {
+						greatestValue = currentValue;
+						greatestIndex = j;
+					}
+					System.out.println(j + "\t" + expectedOutput.get(j) + "\t" + currentValue);
+				}
+				
+				if (expectedOutput.get(greatestIndex) == 1) {
+					correct++;
+				}
+			}
+			
+			System.out.println("Epoch " + epoch + ": " + correct + "/" + 100);
+			network.saveAs("networks/new-arch-test/mnist-cnn-softmax.lrn");
+		}
 	}
 	
 	/**

@@ -11,7 +11,7 @@ import dezzy.neuronz2.math.utility.IndexedGenerator;
  *
  * @author Joe Desmond
  */
-public final class Vector extends ElementContainer<Vector> {
+public class Vector extends ElementContainer<Vector> {
 	/**
 	 * 
 	 */
@@ -20,7 +20,7 @@ public final class Vector extends ElementContainer<Vector> {
 	/**
 	 * The components of the Vector, these should not change.
 	 */
-	private final double[] components;
+	protected final double[] components;
 	
 	/**
 	 * The length of the Vector in space, calculated upon construction
@@ -50,6 +50,17 @@ public final class Vector extends ElementContainer<Vector> {
 	 */
 	public VectorShape shape() {
 		return new VectorShape(dimension);
+	}
+	
+	/**
+	 * Gets the components array of another vector. Useful for modifying another vector's components
+	 * from within a subclass.
+	 * 
+	 * @param other other vector
+	 * @return components of <code>other</code>
+	 */
+	protected double[] getComponents(final Vector other) {
+		return other.components;
 	}
 	
 	/**
