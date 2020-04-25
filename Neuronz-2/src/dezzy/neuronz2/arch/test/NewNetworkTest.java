@@ -6,18 +6,23 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.zip.DataFormatException;
 
 import dezzy.neuronz2.ann.error.VectorErrorFunctions;
 import dezzy.neuronz2.ann.layers.DenseLayer;
+import dezzy.neuronz2.ann.layers.SoftmaxLayer;
 import dezzy.neuronz2.arch.ForwardPassResult;
 import dezzy.neuronz2.arch.LayeredNetwork;
 import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.ElementActivationLayer;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.arch.layers.LayerSequence;
+import dezzy.neuronz2.dataio.MnistConvLoader;
 import dezzy.neuronz2.dataio.MnistLoader;
+import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.FuncDerivPair;
 import dezzy.neuronz2.math.constructs.Matrix;
+import dezzy.neuronz2.math.constructs.Tensor3;
 import dezzy.neuronz2.math.constructs.Vector;
 import dezzy.neuronz2.math.utility.IndexedGenerator;
 import dezzy.neuronz2.math.utility.TensorApplier;
@@ -28,21 +33,207 @@ import dezzy.neuronz2.math.utility.TensorApplier;
  *
  * @author Joe Desmond
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked"})
 public class NewNetworkTest {
 	
 	/**
 	 * Runs one or more of the test functions defined in this class.
 	 * 
 	 * @param args unused
-	 * @throws IOException if there is a problem saving/loading network files
+	 * @throws IOException if there is a problem saving/loading files
 	 * @throws ClassNotFoundException if there is a problem deserializing networks from files
 	 */
 	public static final void main(final String[] args) throws IOException, ClassNotFoundException {
 		//andGateTest();
 		//lrnLoadTest();
 		//andGateTest2();
-		mnistANNTest();
+		//mnistANNTest();
+		mnistANNSoftmaxTest();
+	}
+	
+	private static final void mnistCNNTest() throws IOException, DataFormatException {
+		
+		/**
+		 * 28 x 28 x 1 tensors, 28 pixels wide by 28 pixels tall, 1 layer deep for grayscale image (training images)
+		 */
+		final Tensor3[] trainingInputs = MnistConvLoader.loadImages("data/mnist/train-images.idx3-ubyte");
+		
+		/**
+		 * Expected digits for each MNIST training image
+		 */
+		final byte[] trainingDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
+		
+		/**
+		 * One-hot expected training digit vectors
+		 */
+		final Vector[] trainingOutputs = new Vector[trainingInputs.length];
+		
+		for (int i = 0; i < trainingDigits.length; i++) {
+			final double[] values = new double[10];
+			values[trainingDigits[i]] = 1;
+			trainingOutputs[i] = new Vector(values);
+		}
+		
+		/**
+		 * 28 x 28 x 1 tensors, 28 pixels wide by 28 pixels tall, 1 layer deep for grayscale image (test images)
+		 */
+		final Tensor3[] testInputs = MnistConvLoader.loadImages("data/mnist/test-images.idx3-ubyte");
+		
+		/**
+		 * Expected digits for each MNIST test image
+		 */
+		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
+		
+		/**
+		 * One-hot expected test digit vectors
+		 */
+		final Vector[] testOutputs = new Vector[testInputs.length];
+		
+		for (int i = 0; i < testDigits.length; i++) {
+			final double[] values = new double[10];
+			values[testDigits[i]] = 1;
+			testOutputs[i] = new Vector(values);
+		}
+		
+		final InputOutputPair<Tensor3, Vector>[] trainingData = (InputOutputPair<Tensor3, Vector>[]) new InputOutputPair<?, ?>[trainingInputs.length];
+		for (int i = 0; i < trainingInputs.length; i++) {
+			trainingData[i] = new InputOutputPair<>(trainingInputs[i], trainingOutputs[i]);
+		}
+		
+		final InputOutputPair<Tensor3, Vector>[] testData = (InputOutputPair<Tensor3, Vector>[]) new InputOutputPair<?, ?>[testInputs.length];
+		for (int i = 0; i < testInputs.length; i++) {
+			testData[i] = new InputOutputPair<>(testInputs[i], testOutputs[i]);
+		}
+		
+		final Random random = new Random();
+		
+		// TODO: finish this
+	}
+	
+	/**
+	 * Same as {@link #mnistANNTest()}, except the softmax activation function is used as the last layer (instead of sigmoid)
+	 * and the network is trained with cross-entropy instead of mean-square-error.
+	 * 
+	 * @throws IOException if there is a problem saving the network
+	 */
+	private static final void mnistANNSoftmaxTest() throws IOException {
+		/**
+		 * Vectors of length 784, MNIST training image data
+		 */
+		final Vector[] trainingInputs = MnistLoader.loadImages("data/mnist/train-images.idx3-ubyte");
+		
+		/**
+		 * Expected digits for each MNIST training image
+		 */
+		final byte[] expectedDigits = MnistLoader.loadLabels("data/mnist/train-labels.idx1-ubyte");
+		
+		/**
+		 * One-hot expected training digit vectors
+		 */
+		final Vector[] trainingOutputs = new Vector[trainingInputs.length];
+		
+		for (int i = 0; i < expectedDigits.length; i++) {
+			final double[] values = new double[10];
+			values[expectedDigits[i]] = 1;
+			trainingOutputs[i] = new Vector(values);
+		}
+		
+		/**
+		 * Vectors of length 784, MNIST test image data
+		 */
+		final Vector[] testInputs = MnistLoader.loadImages("data/mnist/test-images.idx3-ubyte");
+		
+		/**
+		 * Expected digits for each MNIST test image
+		 */
+		final byte[] testDigits = MnistLoader.loadLabels("data/mnist/test-labels.idx1-ubyte");
+		
+		/**
+		 * One-hot expected test digit vectors
+		 */
+		final Vector[] testOutputs = new Vector[testInputs.length];
+		
+		for (int i = 0; i < testDigits.length; i++) {
+			final double[] values = new double[10];
+			values[testDigits[i]] = 1;
+			testOutputs[i] = new Vector(values);
+		}
+		
+		final InputOutputPair<Vector, Vector>[] trainingData = (InputOutputPair<Vector, Vector>[]) new InputOutputPair<?, ?>[trainingInputs.length];
+		for (int i = 0; i < trainingInputs.length; i++) {
+			trainingData[i] = new InputOutputPair<>(trainingInputs[i], trainingOutputs[i]);
+		}
+		
+		final InputOutputPair<Vector, Vector>[] testData = (InputOutputPair<Vector, Vector>[]) new InputOutputPair<?, ?>[testInputs.length];
+		for (int i = 0; i < testInputs.length; i++) {
+			testData[i] = new InputOutputPair<>(testInputs[i], testOutputs[i]);
+		}
+		
+		final Random random = new Random();
+		
+		final DenseLayer inputLayer = DenseLayer.generate(random, WeightInitFunc.STANDARD_NORMAL_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 784, 30);
+		final ElementActivationLayer<Vector> sigmoid0 = new ElementActivationLayer<>(FuncDerivPair.SIGMOID);
+		final DenseLayer hiddenLayer = DenseLayer.generate(random, WeightInitFunc.XAVIER_INIT, WeightInitFunc.XAVIER_INIT, 30, 10);
+		final SoftmaxLayer softmax = new SoftmaxLayer();
+		
+		final List<Layer<Vector, Vector>> layers = List.of(inputLayer, sigmoid0, hiddenLayer, softmax);
+		
+		final Layer<Vector, Vector> layerSequence = new LayerSequence<>(layers);
+		final LayeredNetwork<Vector, Vector> network = new LayeredNetwork<>(layerSequence, VectorErrorFunctions.CROSS_ENTROPY);
+		System.out.println("Network initialized with " + layerSequence.parameterCount() + " learnable parameters.");
+		
+		final int minibatchSize = 10;
+		final double learningRate = 2.0;
+		
+		for (int epoch = 0; epoch < 30; epoch++) {
+			Collections.shuffle(Arrays.asList(trainingData));
+			
+			//Training images			
+			int index = 0;
+			while (index < trainingData.length) {
+				
+				for (int i = 0; i < minibatchSize; i++) {
+					final Vector input = trainingData[index].input;
+					final Vector expectedOutput = trainingData[index].output;
+					
+					final ForwardPassResult<Vector> result = network.forwardPass(input, expectedOutput);
+					network.backprop(expectedOutput, result.actualOutput, result.error);
+					
+					index++;
+				}
+				
+				network.update(learningRate / minibatchSize);
+			}
+			
+			//Test images
+			int correct = 0;
+			for (int i = 0; i < testData.length; i++) {
+				final Vector input = testData[i].input;
+				final Vector expectedOutput = testData[i].output;
+				
+				final ForwardPassResult<Vector> result = network.forwardPass(input, expectedOutput);
+				final Vector actual = result.actualOutput;
+								
+				int greatestIndex = 0;
+				double greatestValue = 0;
+				
+				for (int j = 0; j < 10; j++) {
+					double currentValue = actual.get(j);
+					
+					if (currentValue > greatestValue) {
+						greatestValue = currentValue;
+						greatestIndex = j;
+					}
+				}
+				
+				if (expectedOutput.get(greatestIndex) == 1) {
+					correct++;
+				}
+			}
+			
+			System.out.println("Epoch " + epoch + ": " + correct + "/" + testData.length);
+			network.saveAs("networks/new-arch-test/mnist-ann-softmax.lrn");
+		}
 	}
 	
 	/**
@@ -96,14 +287,14 @@ public class NewNetworkTest {
 			testOutputs[i] = new Vector(values);
 		}
 		
-		final InputOutputPair[] trainingData = new InputOutputPair[trainingInputs.length];
+		final InputOutputPair<Vector, Vector>[] trainingData = (InputOutputPair<Vector, Vector>[]) new InputOutputPair<?, ?>[trainingInputs.length];
 		for (int i = 0; i < trainingInputs.length; i++) {
-			trainingData[i] = new InputOutputPair(trainingInputs[i], trainingOutputs[i]);
+			trainingData[i] = new InputOutputPair<>(trainingInputs[i], trainingOutputs[i]);
 		}
 		
-		final InputOutputPair[] testData = new InputOutputPair[testInputs.length];
+		final InputOutputPair<Vector, Vector>[] testData = (InputOutputPair<Vector, Vector>[]) new InputOutputPair<?, ?>[testInputs.length];
 		for (int i = 0; i < testInputs.length; i++) {
-			testData[i] = new InputOutputPair(testInputs[i], testOutputs[i]);
+			testData[i] = new InputOutputPair<>(testInputs[i], testOutputs[i]);
 		}
 		
 		final Random random = new Random();
@@ -162,8 +353,6 @@ public class NewNetworkTest {
 						greatestIndex = j;
 					}
 				}
-					
-					//System.out.println(j + "\t" + expectedOutput.get(j) + "\t" + actual.get(j));
 				
 				if (expectedOutput.get(greatestIndex) == 1) {
 					correct++;
@@ -175,25 +364,32 @@ public class NewNetworkTest {
 		}
 	}
 	
-	private static final class InputOutputPair {
+	/**
+	 * An input to a neural network and the expected output, for that input.
+	 *
+	 * @author Joe Desmond
+	 * @param <I> input tensor type
+	 * @param <O> output tensor type
+	 */
+	private static final class InputOutputPair<I extends ElementContainer<I>, O extends ElementContainer<O>> {
 		
 		/**
-		 * Input vector
+		 * Input tensor
 		 */
-		final Vector input;
+		final I input;
 		
 		/**
-		 * Expected output vector
+		 * Expected output tensor
 		 */
-		final Vector output;
+		final O output;
 		
 		/**
-		 * Creates an {@link InputOutputPair} with the given input and expected output vectors.
+		 * Creates an {@link InputOutputPair} with the given input and expected output tensors.
 		 * 
-		 * @param _input input vector
-		 * @param _output expected output vector
+		 * @param _input input tensor
+		 * @param _output expected output tensor
 		 */
-		InputOutputPair(final Vector _input, final Vector _output) {
+		InputOutputPair(final I _input, final O _output) {
 			input = _input;
 			output = _output;
 		}
