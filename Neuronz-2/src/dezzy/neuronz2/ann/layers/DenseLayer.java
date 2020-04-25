@@ -52,7 +52,6 @@ public class DenseLayer implements Layer<Vector, Vector> {
 		bias = _bias;
 	}
 	
-	
 	@Override
 	public Vector forwardPass(final Vector prevActivations) {
 		final Vector multiplied = weights.multiply(prevActivations);
@@ -104,5 +103,4 @@ public class DenseLayer implements Layer<Vector, Vector> {
 	public int parameterCount() {
 		return bias.dimension + (weights.rows * weights.cols);
 	}
-	
 }

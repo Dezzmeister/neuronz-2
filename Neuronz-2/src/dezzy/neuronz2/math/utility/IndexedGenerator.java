@@ -1,6 +1,5 @@
 package dezzy.neuronz2.math.utility;
 
-
 /**
  * Defines a function that can generate a value for a tensor of any rank, given the indices
  * into the tensor.

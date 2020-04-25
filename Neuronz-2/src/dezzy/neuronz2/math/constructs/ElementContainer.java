@@ -93,4 +93,17 @@ public abstract class ElementContainer<T> implements Serializable {
 	public final T elementDivide(final T other) {
 		return elementOperation(other, DIVIDE);
 	}
+	
+	/**
+	 * Scales this tensor by some amount. Multiplies every element by the given value and returns a new
+	 * ElementContainer with the result.
+	 * 
+	 * @param value scale factor
+	 * @return new ElementContainer scaled by <code>value</code>
+	 */
+	public final T scale(final double value) {
+		final DoubleApplier scaler = d -> d * value;
+		
+		return transform(scaler);
+	}
 }

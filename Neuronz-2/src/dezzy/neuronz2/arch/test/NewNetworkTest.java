@@ -34,8 +34,9 @@ public class NewNetworkTest {
 	/**
 	 * Tries to load the "and-gate" network saved by {@link #andGateTest()} and test it
 	 * on some inputs.
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
+	 * 
+	 * @throws IOException if there is a problem reading the file
+	 * @throws ClassNotFoundException if there is a problem deserializing the object stored in the file
 	 */
 	private static final void lrnLoadTest() throws ClassNotFoundException, IOException {
 		final LayeredNetwork<Vector, Vector> andNetwork = LayeredNetwork.loadFrom("networks/new-arch-test/andgate.lrn");

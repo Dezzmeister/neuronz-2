@@ -116,7 +116,7 @@ public class ConvolutionLayer2 implements Layer<Tensor3, Tensor3> {
 	 * <li>Computes the derivative of the error with respect to this layer's input. For each channel, every layer of 
 	 * the padded <code>errorOutputDeriv</code> is convolved with the channel layer (rotated 180 degrees) in it's corresponding filter.
 	 * The derivative of the error with respect to the layer's input for the channel is given by summing
-	 * the results of these convolutions.
+	 * the results of these convolutions.</li>
 	 * </ol>
 	 * 
 	 * @param errorOutputDeriv (partial) derivative of the network error with respect to this layer's output
