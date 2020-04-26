@@ -53,7 +53,7 @@ public class FastVector extends Vector {
 	 * Initializes the FastVector class and loads OpenCL kernels for the optimized functions. Kernel code is
 	 * stored at <code>"kernels/math/vector"</code>, and the kernels are compiled in this function.
 	 * 
-	 * @param clState OpenCL state objects
+	 * @param clState OpenCL state object
 	 * @throws IOException if there is a problem loading the kernels
 	 */
 	public static void initialize(final CLState clState) throws IOException {
@@ -145,6 +145,6 @@ public class FastVector extends Vector {
         CL.clReleaseMemObject(srcMemB);
         CL.clReleaseMemObject(dstMem);
         
-        return new Vector(result);
+        return new FastVector(result);
 	}
 }

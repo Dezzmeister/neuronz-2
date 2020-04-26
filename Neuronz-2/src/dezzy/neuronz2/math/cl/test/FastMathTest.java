@@ -19,6 +19,7 @@ import org.jocl.cl_queue_properties;
 import dezzy.neuronz2.cl.CLState;
 import dezzy.neuronz2.cl.CLUtilities;
 import dezzy.neuronz2.math.cl.FastVector;
+import dezzy.neuronz2.math.cl.memory.MemoryManager;
 import dezzy.neuronz2.math.constructs.Vector;
 
 /**
@@ -31,9 +32,25 @@ public class FastMathTest {
 	
 	public static final void main(final String[] args) throws IOException {
 		//simpleKernelTest();
-		frameworkFunctionTest();
+		//frameworkFunctionTest();
+		lowLevelMemoryTest();
 	}
 	
+	private static final void lowLevelMemoryTest() {
+		final MemoryManager memory = new MemoryManager();
+		final double[] ptr = memory.alignedMalloc(64, 64);
+		ptr[63] = 1738.16;
+		
+		System.out.println(ptr[63]);
+		memory.alignedFree(ptr);
+		System.out.println("No exceptions");
+	}
+	
+	/**
+	 * Tests some of the framework functions for OpenCL operations.
+	 * 
+	 * @throws IOException if there is a problem loading OpenCL kernel code
+	 */
 	private static final void frameworkFunctionTest() throws IOException {
 		final CLState clState = CLState.createInstance(CL.CL_DEVICE_TYPE_GPU);
 		FastVector.initialize(clState);

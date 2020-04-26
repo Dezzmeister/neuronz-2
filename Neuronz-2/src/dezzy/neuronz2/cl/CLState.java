@@ -1,12 +1,14 @@
 package dezzy.neuronz2.cl;
 
 import org.jocl.CL;
+import org.jocl.Pointer;
 import org.jocl.cl_command_queue;
 import org.jocl.cl_context;
 import org.jocl.cl_context_properties;
 import org.jocl.cl_device_id;
 import org.jocl.cl_platform_id;
 import org.jocl.cl_queue_properties;
+import org.jocl.blast.CLBlast;
 
 /**
  * Contains various OpenCL state objects. These objects will generally persist while Neuronz-2
@@ -66,6 +68,7 @@ public class CLState {
         final int deviceIndex = 0;
 		
 		CL.setExceptionsEnabled(true);
+		CLBlast.setExceptionsEnabled(true);
 		
 		final int[] numPlatformsArray = new int[1];
 		CL.clGetPlatformIDs(0, null, numPlatformsArray);
@@ -96,7 +99,30 @@ public class CLState {
         final cl_queue_properties properties = new cl_queue_properties();
         final cl_command_queue commandQueue = CL.clCreateCommandQueueWithProperties(context, device, properties, null);
         
+        final String deviceName = getString(device, CL.CL_DEVICE_NAME);
+        System.out.println("Initialized device: " + deviceName);
+        
         return new CLState(platform, device, context, commandQueue);
+	}
+	
+	/**
+	 * Gets a String value of a given device. The name of the value is specified by
+	 * <code>paramName</code>, which is an integer corresponding to the value. For example,
+	 * <code>paramName</code> could be {@link CL#CL_DEVICE_NAME}.
+	 * 
+	 * @param device OpenCL device
+	 * @param paramName parameter name
+	 * @return String value of the given parameter for the given device
+	 */
+	private static String getString(final cl_device_id device, final int paramName) {
+		final long[] size = new long[1];
+		CL.clGetDeviceInfo(device, paramName, 0, null, size);
+		
+		final byte[] buffer = new byte[(int) size[0]];
+		
+		CL.clGetDeviceInfo(device, paramName, buffer.length, Pointer.to(buffer), null);
+		
+		return new String(buffer);
 	}
 	
 	/**
