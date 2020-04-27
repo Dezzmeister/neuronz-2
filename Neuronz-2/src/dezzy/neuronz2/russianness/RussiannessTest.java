@@ -150,13 +150,13 @@ public class RussiannessTest {
 		 */
 		final Random random = new Random();
 		
-		final ConvolutionLayer2 conv0 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 5, 3, 5, 5);
+		final ConvolutionLayer2 conv0 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.SMALL_VALUE_INIT, 5, 3, 5, 5);
 		final ElementActivationLayer<Tensor3> relu0 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
 		final PoolingLayer maxpooling0 = new PoolingLayer(PoolingOperation.MAX_POOLING, 2, 2, 2, 2);
-		final ConvolutionLayer2 conv1 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 10, 5, 5, 5);
+		final ConvolutionLayer2 conv1 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.SMALL_VALUE_INIT, 10, 5, 5, 5);
 		final ElementActivationLayer<Tensor3> relu1 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
 		final PoolingLayer maxpooling1 = new PoolingLayer(PoolingOperation.MAX_POOLING, 2, 2, 2, 2);
-		final ConvolutionLayer2 conv2 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 10, 10, 5, 5);
+		final ConvolutionLayer2 conv2 = ConvolutionLayer2.generate(random, WeightInitFunc.KAIMING_INIT, WeightInitFunc.SMALL_VALUE_INIT, 10, 10, 5, 5);
 		final ElementActivationLayer<Tensor3> relu2 = new ElementActivationLayer<>(FuncDerivPair.LEAKY_RELU);
 		final PoolingLayer maxpooling2 = new PoolingLayer(PoolingOperation.MAX_POOLING, 5, 5, 5, 5);
 		
@@ -164,11 +164,11 @@ public class RussiannessTest {
 		final ParallelLayer<Tensor3, Tensor3> featureExtractor = new ParallelLayerSequence<>(featureExtractorLayers);
 		final ParallelLayer<Tensor3, Vector> flattener = new ConvFlattener(10, 11, 11);
 		
-		final DenseLayer fc0 = DenseLayer.generate(random, WeightInitFunc.STANDARD_NORMAL_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 1210, 500);
+		final DenseLayer fc0 = DenseLayer.generate(random, WeightInitFunc.XAVIER_INIT, WeightInitFunc.SMALL_VALUE_INIT, 1210, 500);
 		final ElementActivationLayer<Vector> sigmoid0 = new ElementActivationLayer<>(FuncDerivPair.SIGMOID);
-		final DenseLayer fc1 = DenseLayer.generate(random, WeightInitFunc.STANDARD_NORMAL_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 500, 100);
+		final DenseLayer fc1 = DenseLayer.generate(random, WeightInitFunc.XAVIER_INIT, WeightInitFunc.SMALL_VALUE_INIT, 500, 100);
 		final ElementActivationLayer<Vector> sigmoid1 = new ElementActivationLayer<>(FuncDerivPair.SIGMOID);
-		final DenseLayer fc2 = DenseLayer.generate(random, WeightInitFunc.STANDARD_NORMAL_INIT, WeightInitFunc.STANDARD_NORMAL_INIT, 100, 5);
+		final DenseLayer fc2 = DenseLayer.generate(random, WeightInitFunc.XAVIER_INIT, WeightInitFunc.SMALL_VALUE_INIT, 100, 5);
 		final SoftmaxLayer softmax = new SoftmaxLayer();
 		
 		final List<ParallelLayer<Vector, Vector>> classifierLayers = List.of(fc0, sigmoid0, fc1, sigmoid1, fc2, softmax);
@@ -217,6 +217,7 @@ public class RussiannessTest {
 					
 					final Vector actual = networkPass.actualOutput;
 					final Vector expected = networkPass.expectedOutput;
+					//System.out.println((j + i) + ":\t" + actual);
 					
 					int greatestIndex = 0;
 					double greatestValue = Double.NEGATIVE_INFINITY;
@@ -264,6 +265,7 @@ public class RussiannessTest {
 			}
 			
 			System.out.println("Epoch " + epoch + ": " + successes + "/" + dataset.images.length);
+			ParallelLayer.saveAs(convNetwork, "networks/russianness/russianness.lrn");
 		}
 	}
 	
