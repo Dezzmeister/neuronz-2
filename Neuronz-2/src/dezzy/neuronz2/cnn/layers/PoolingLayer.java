@@ -1,7 +1,14 @@
 package dezzy.neuronz2.cnn.layers;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.ParallelLayer;
 import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.cnn.pooling.PoolingOperation;
+import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
 
@@ -10,7 +17,7 @@ import dezzy.neuronz2.math.constructs.Tensor3;
  *
  * @author Joe Desmond
  */
-public class PoolingLayer implements Layer<Tensor3, Tensor3> {
+public class PoolingLayer implements ParallelLayer<Tensor3, Tensor3> {
 	
 	/**
 	 * 
@@ -124,5 +131,54 @@ public class PoolingLayer implements Layer<Tensor3, Tensor3> {
 	@Override
 	public int parameterCount() {
 		return 0;
+	}
+	
+	/**
+	 * Returns one because this layer is not composed of any sublayers.
+	 * 
+	 * @return one
+	 */
+	@Override
+	public int sublayers() {
+		return 1;
+	}
+
+	@Override
+	public ParallelForwardPass<Tensor3> parallelForwardPass(final Tensor3 prevActivations) {
+		final Map<Layer<?, ?>, ElementContainer<?>> latestInputs = new HashMap<>();
+		
+		final Matrix[] output = new Matrix[prevActivations.dimension];
+		
+		for (int i = 0; i < prevActivations.dimension; i++) {
+			final Matrix result = prevActivations.getLayer(i).poolingTransform(windowRows, windowCols, rowStride, colStride, poolingOperation);
+			
+			output[i] = result;
+		}
+		
+		latestInputs.put(this, prevActivations);
+		
+		return new ParallelForwardPass<>(new Tensor3(output), latestInputs, Map.of());
+	}
+
+	@Override
+	public ParallelBackwardPass<Tensor3> parallelBackprop(final ParallelForwardPass<Tensor3> prevForward, final Tensor3 errorOutputDeriv, final boolean isFirstLayer) {
+		final Tensor3 prevLatestInput = (Tensor3) prevForward.latestInputs.get(this);
+		
+		final Matrix[] errorInputDeriv = new Matrix[errorOutputDeriv.dimension];
+		
+		for (int m = 0; m < errorOutputDeriv.dimension; m++) {
+			final Matrix pooled = errorOutputDeriv.getLayer(m);
+			final Matrix input = prevLatestInput.getLayer(m);
+			
+			errorInputDeriv[m] = poolingOperation.backprop(input, pooled, windowRows, windowCols, rowStride, colStride);
+		}
+		
+		return new ParallelBackwardPass<>(new Tensor3(errorInputDeriv), Map.of());
+	}
+
+	@Override
+	public void parallelUpdate(final ParallelBackwardPass<?> gradients, final double learningRate) {
+		// TODO Auto-generated method stub
+		
 	}
 }

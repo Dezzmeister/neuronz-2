@@ -1,6 +1,13 @@
 package dezzy.neuronz2.ann.layers;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.layers.Layer;
 import dezzy.neuronz2.arch.layers.TensorActivationLayer;
+import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Vector;
 
@@ -72,5 +79,42 @@ public class SoftmaxLayer extends TensorActivationLayer<Vector> {
 		final Matrix jacobian = new Matrix(values);
 		
 		return jacobian.multiply(errorOutputDeriv);
+	}
+	
+	@Override
+	public ParallelForwardPass<Vector> parallelForwardPass(final Vector prevActivations) {
+		final Map<Layer<?, ?>, ElementContainer<?>> latestOutputs = new HashMap<>();
+		
+		final Vector raised = prevActivations.transform(d -> Math.exp(d));
+		final double sum = raised.sum();
+		
+		final Vector newLatestOutput = raised.transform(d -> d / sum);
+		
+		latestOutputs.put(this, newLatestOutput);
+		
+		return new ParallelForwardPass<>(newLatestOutput, Map.of(), latestOutputs);
+	}
+	
+	@Override
+	public ParallelBackwardPass<Vector> parallelBackprop(final ParallelForwardPass<Vector> prevForward, final Vector errorOutputDeriv, final boolean isFirstLayer) {
+		final Vector prevLatestOutput = (Vector) prevForward.latestOutputs.get(this);
+		
+		final double[][] values = new double[prevLatestOutput.dimension][prevLatestOutput.dimension];
+		
+		for (int row = 0; row < values.length; row++) {
+			for (int col = 0; col < values[0].length; col++) {
+				if (row == col) {
+					values[row][col] = prevLatestOutput.get(row) * (1 - prevLatestOutput.get(row));
+				} else {
+					values[row][col] = -prevLatestOutput.get(row) * prevLatestOutput.get(col);
+				}
+			}
+		}
+		
+		final Matrix jacobian = new Matrix(values);
+		
+		final Vector out = jacobian.multiply(errorOutputDeriv);
+		
+		return new ParallelBackwardPass<>(out, Map.of());
 	}
 }

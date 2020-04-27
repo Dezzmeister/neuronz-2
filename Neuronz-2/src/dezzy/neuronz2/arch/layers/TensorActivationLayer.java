@@ -1,5 +1,11 @@
 package dezzy.neuronz2.arch.layers;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.ParallelLayer;
 import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.TensorFunction;
 
@@ -10,7 +16,7 @@ import dezzy.neuronz2.math.constructs.TensorFunction;
  * @author Joe Desmond
  * @param <T> tensor type (vector, matrix, etc.)
  */
-public class TensorActivationLayer<T extends ElementContainer<T>> implements Layer<T, T> {
+public class TensorActivationLayer<T extends ElementContainer<T>> implements ParallelLayer<T, T> {
 	
 	/**
 	 * 
@@ -73,7 +79,7 @@ public class TensorActivationLayer<T extends ElementContainer<T>> implements Lay
 	 */
 	@Override
 	public void update(final double learningRate) {
-				
+		
 	}
 	
 	/**
@@ -84,5 +90,42 @@ public class TensorActivationLayer<T extends ElementContainer<T>> implements Lay
 	@Override
 	public int parameterCount() {
 		return 0;
+	}
+	
+	/**
+	 * Returns one because this layer is not composed of any sublayers.
+	 * 
+	 * @return one
+	 */
+	@Override
+	public int sublayers() {
+		return 1;
+	}
+
+	@Override
+	public ParallelForwardPass<T> parallelForwardPass(final T prevActivations) {
+		final Map<Layer<?, ?>, ElementContainer<?>> latestInputs = new HashMap<>();
+		
+		latestInputs.put(this, prevActivations);
+		
+		final T output = activationFunction.function.apply(prevActivations);
+		
+		return new ParallelForwardPass<>(output, latestInputs, Map.of());
+	}
+
+	@Override
+	public ParallelBackwardPass<T> parallelBackprop(final ParallelForwardPass<T> prevForward, final T errorOutputDeriv, final boolean isFirstLayer) {
+		@SuppressWarnings("unchecked")
+		final T prevLatestInput = (T) prevForward.latestInputs.get(this);
+		
+		final T outputInputDeriv = activationFunction.derivative.apply(prevLatestInput);
+		
+		return new ParallelBackwardPass<>(errorOutputDeriv.hadamard(outputInputDeriv), Map.of());
+	}
+
+	@Override
+	public void parallelUpdate(final ParallelBackwardPass<?> gradients, final double learningRate) {
+		// TODO Auto-generated method stub
+		
 	}
 }

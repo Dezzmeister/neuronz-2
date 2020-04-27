@@ -15,7 +15,7 @@ final class KaimingInitFunc implements WeightInitFunc {
 
 	@Override
 	public <T extends ElementContainer<T>> T initialize(final Random random, final Shape<T> shape, final int numInputs, final int numOutputs, final int numWeights) {		
-		final double modifier = Math.sqrt(2 / (numInputs + numOutputs));
+		final double modifier = Math.sqrt(2 / (numInputs));
 		final IndexedGenerator generator = i -> random.nextGaussian() * modifier;
 		
 		return shape.generate(generator);

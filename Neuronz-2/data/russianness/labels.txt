@@ -1,0 +1,42 @@
+================= Russianness Painting Data =================
+
+Data is organized in tab-delimited columns.
+Column 1:	File name, in "data/russianness/paintings"
+Column 2:	Russianness of the painting; decimal from 0 to 1.
+		0.00:	Not Russian
+		0.25:	Slightly Russian
+		0.50:	Moderately Russian
+		0.75:	Very Russian
+		1.00:	Definitely Russian
+
+Data[30]:
+man-with-a-hoe.jpg	0.00
+morning-of-our-motherland.jpg	1.00
+stalin-and-voroshilov.jpg	1.00
+morning-of-streltsy-execution.jpg	1.00
+taking-in-the-rye.jpeg	1.00
+girl-in-harvest-field.jpg	0.50
+hay-harvest.jpg	0.25
+the-gulf-stream.jpg	0.00
+lenin-in-smolny.jpg	0.75
+defense-of-sevastopol.jpg	1.00
+bathing-of-a-red-horse.jpg	0.75
+19th-century-farm-family.jpg	0.50
+farmer-whetting-his-sythe.jpg	0.25
+barge-haulers-on-the-volga.jpg	1.00
+the-rooks-have-returned.jpg	1.00
+christ-in-the-desert.jpg	1.00
+la-grande-jatte.jpg	0.00
+harvest-festival.png	1.00
+mt-lafayette.jpg	0.00
+red-ventilator.jpg	0.25
+whistlers-mother.png	0.00
+football-players.png	0.00
+composition-8.png	0.25
+stalin-roses.jpg	1.00
+builders-of-bratsk.jpg	0.75
+unexpected-visitors.jpg	1.00
+happy-reuniting.jpg	0.75
+steel-workers.jpg	0.75
+lenin-with-villagers.jpg	0.75
+bad-grade.jpg	0.50

@@ -1,9 +1,16 @@
 package dezzy.neuronz2.cnn.layers;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.ParallelLayer;
 import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.Layer;
+import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
 import dezzy.neuronz2.math.constructs.Tensor4;
@@ -20,7 +27,7 @@ import dezzy.neuronz2.math.utility.DoubleApplier;
  *
  * @author Joe Desmond
  */
-public class ConvolutionLayer2 implements Layer<Tensor3, Tensor3> {
+public class ConvolutionLayer2 implements ParallelLayer<Tensor3, Tensor3> {
 	
 	/**
 	 * 
@@ -265,5 +272,126 @@ public class ConvolutionLayer2 implements Layer<Tensor3, Tensor3> {
 		final Tensor3 t = filters.getTensor(0);
 		final Matrix m = t.getLayer(0);
 		return biases.dimension + (filters.dimension * t.dimension * m.rows * m.cols);
+	}
+	
+	/**
+	 * Returns one because this layer is not composed of any sublayers.
+	 * 
+	 * @return one
+	 */
+	@Override
+	public int sublayers() {
+		return 1;
+	}
+
+	@Override
+	public ParallelForwardPass<Tensor3> parallelForwardPass(final Tensor3 prevActivations) {
+		final Map<Layer<?, ?>, ElementContainer<?>> latestInputs = new HashMap<>();
+		latestInputs.put(this, prevActivations);
+		
+		final Matrix[] output = new Matrix[filters.dimension];
+		
+		for (int i = 0; i < filters.dimension; i++) {
+			final Tensor3 kernel = filters.getTensor(i);
+			final Tensor3 convolved = prevActivations.convolve(kernel, 1, NON_MODIFIER);
+			final Matrix result = convolved.getLayer(0);
+			final double bias = biases.get(i);
+			
+			output[i] = result.transform(d -> d + bias);
+		}
+		
+		final Tensor3 nextActivations = new Tensor3(output);
+		
+		return new ParallelForwardPass<>(nextActivations, latestInputs, Map.of());
+	}
+
+	@Override
+	public ParallelBackwardPass<Tensor3> parallelBackprop(final ParallelForwardPass<Tensor3> prevForward, final Tensor3 errorOutputDeriv, final boolean isFirstLayer) {
+		final Map<Layer<?, ?>, List<ElementContainer<?>>> gradients = new HashMap<>();
+		
+		final Tensor3[] newFilterDeltas = new Tensor3[filters.dimension];
+		final double[] newBiasDeltas = new double[filters.dimension];
+		
+		final Tensor3 prevLatestInput = (Tensor3) prevForward.latestInputs.get(this);
+		
+		// Calculate filter and bias gradients
+		for (int i = 0; i < errorOutputDeriv.dimension; i++) {
+			final Matrix derivMatrix = errorOutputDeriv.getLayer(i);
+			final Matrix[] channelGradients = new Matrix[prevLatestInput.dimension];
+			
+			for (int m = 0; m < prevLatestInput.dimension; m++) {
+				final Matrix channel = prevLatestInput.getLayer(m);
+				
+				channelGradients[m] = channel.convolve(derivMatrix, 1, NON_MODIFIER);
+			}
+			
+			newFilterDeltas[i] = new Tensor3(channelGradients);
+			
+			newBiasDeltas[i] = derivMatrix.sum();
+		}
+		
+		// Update filter deltas
+		final Tensor4 filterGradient = new Tensor4(newFilterDeltas);
+		
+		// Update bias deltas
+		final Vector biasGradient = new Vector(newBiasDeltas);
+		
+		gradients.put(this, List.of(filterGradient, biasGradient));
+		
+		if (isFirstLayer) {
+			return new ParallelBackwardPass<>(null, gradients);
+		}
+		
+		
+		// Create padded versions of the derivative matrices to compute the next derivatives with
+		final Matrix[] paddedDerivatives = new Matrix[errorOutputDeriv.dimension];
+		
+		for (int i = 0; i < paddedDerivatives.length; i++) {
+			final Matrix derivative = errorOutputDeriv.getLayer(i);
+			final Matrix filterLayer = filters.getTensor(i).getLayer(0);
+			final int padRows = filterLayer.rows - 1;
+			final int padCols = filterLayer.cols - 1;
+			
+			final Matrix padded = derivative.padZero(padRows, padCols);
+			paddedDerivatives[i] = padded;
+		}
+		
+		// Compute the derivative of the error with respect to this layer's input
+		final Matrix[] output = new Matrix[prevLatestInput.dimension];		
+		
+		for (int channel = 0; channel < output.length; channel++) {
+			Matrix deltas = null;
+			
+			for (int filterIndex = 0; filterIndex < filters.dimension; filterIndex++) {
+				final Matrix derivative = paddedDerivatives[filterIndex];
+				final Matrix filter = filters.getTensor(filterIndex).getLayer(channel).rotate180();
+				
+				final Matrix convolved = derivative.convolve(filter, 1, NON_MODIFIER);
+				
+				if (deltas == null) {
+					deltas = convolved;
+				} else {
+					deltas = deltas.plus(convolved);
+				}
+			}
+			
+			output[channel] = deltas;
+		}
+		
+		return new ParallelBackwardPass<>(new Tensor3(output), gradients);
+	}
+
+	@Override
+	public void parallelUpdate(final ParallelBackwardPass<?> gradients, double learningRate) {
+		final List<ElementContainer<?>> gradientList = gradients.gradients.get(this);
+		
+		final Tensor4 prevFilterDeltas = (Tensor4) gradientList.get(0);
+		final Vector prevBiasDeltas = (Vector) gradientList.get(1);
+		
+		final Tensor4 scaledFilterGradient = prevFilterDeltas.transform(w -> learningRate * w);
+		final Vector scaledBiasGradient = prevBiasDeltas.transform(w -> learningRate * w);
+		
+		filters = filters.minus(scaledFilterGradient);
+		biases = biases.minus(scaledBiasGradient);
 	}
 }

@@ -1,6 +1,10 @@
 package dezzy.neuronz2.cnn.layers;
 
-import dezzy.neuronz2.arch.layers.Layer;
+import java.util.Map;
+
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.ParallelLayer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Tensor3;
 import dezzy.neuronz2.math.constructs.Vector;
@@ -11,7 +15,7 @@ import dezzy.neuronz2.math.constructs.Vector;
  *
  * @author Joe Desmond
  */
-public class ConvFlattener implements Layer<Tensor3, Vector> {
+public class ConvFlattener implements ParallelLayer<Tensor3, Vector> {
 
 	/**
 	 * 
@@ -113,5 +117,54 @@ public class ConvFlattener implements Layer<Tensor3, Vector> {
 	@Override
 	public int parameterCount() {
 		return 0;
+	}
+	
+	/**
+	 * Returns one because this layer is not composed of any sublayers.
+	 * 
+	 * @return one
+	 */
+	@Override
+	public int sublayers() {
+		return 1;
+	}
+
+	@Override
+	public ParallelForwardPass<Vector> parallelForwardPass(final Tensor3 prevActivations) {
+		final double[] out = new double[prevActivations.dimension * prevActivations.getLayer(0).rows * prevActivations.getLayer(0).cols];
+		
+		for (int l = 0; l < prevActivations.dimension; l++) {
+			final Matrix layer = prevActivations.getLayer(l);
+			layer.copyTo(out, l * layer.rows * layer.cols);
+		}
+		
+		return new ParallelForwardPass<>(new Vector(out), Map.of(), Map.of());
+	}
+
+	@Override
+	public ParallelBackwardPass<Tensor3> parallelBackprop(final ParallelForwardPass<Vector> prevForward, final Vector errorOutputDeriv, final boolean isFirstLayer) {
+		final Matrix[] out = new Matrix[inputLayers];
+		
+		for (int l = 0; l < inputLayers; l++) {
+			final Vector[] vectors = new Vector[inputRows];
+			
+			for (int row = 0; row < inputRows; row++) {
+				final double[] elements = new double[inputCols];
+				final int srcIndex = (l * inputRows * inputCols) + (row * inputCols);
+				
+				errorOutputDeriv.copyTo(srcIndex, elements, 0, inputCols);
+				vectors[row] = new Vector(elements);
+			}
+			
+			out[l] = new Matrix(vectors);
+		}
+		
+		return new ParallelBackwardPass<>(new Tensor3(out), Map.of());
+	}
+
+	@Override
+	public void parallelUpdate(final ParallelBackwardPass<?> gradients, final double learningRate) {
+		// TODO Auto-generated method stub
+		
 	}	
 }

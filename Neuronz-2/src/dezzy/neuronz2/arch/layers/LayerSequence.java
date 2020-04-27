@@ -102,4 +102,21 @@ public final class LayerSequence<T extends ElementContainer<T>> implements Layer
 		
 		return sum;
 	}
+	
+	/**
+	 * Returns the total number of sub-layers in this layer sequence, which is the sum of all the sub-layers
+	 * in the {@linkplain #layers layer list}.
+	 * 
+	 * @return total number of sub-layers in this layer sequence
+	 */
+	@Override
+	public int sublayers() {
+		int sublayerCount = 0;
+		
+		for (int i = 0; i < layers.size(); i++) {
+			sublayerCount += layers.get(i).sublayers();
+		}
+		
+		return sublayerCount;
+	}
 }

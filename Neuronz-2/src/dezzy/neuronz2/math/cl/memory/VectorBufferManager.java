@@ -1,6 +1,12 @@
 package dezzy.neuronz2.math.cl.memory;
 
 
+/**
+ * TODO: Finish this
+ *
+ * @author Joe Desmond
+ */
+@SuppressWarnings("unused")
 public class VectorBufferManager {
 	
 	private final MemoryManager memoryManager;

@@ -59,7 +59,7 @@ public class ConvNet<I extends ElementContainer<I>, O extends ElementContainer<O
 	public I backprop(final O errorOutputDeriv, final boolean isFirstLayer) {
 		final O classifierDeriv = classifier.backprop(errorOutputDeriv, false);
 		final I unflattenedDeriv = flattener.backprop(classifierDeriv, false);
-		final I errorInputDeriv = featureExtractor.backprop(unflattenedDeriv, true);
+		final I errorInputDeriv = featureExtractor.backprop(unflattenedDeriv, isFirstLayer);
 		
 		return errorInputDeriv;
 	}
@@ -80,5 +80,16 @@ public class ConvNet<I extends ElementContainer<I>, O extends ElementContainer<O
 	@Override
 	public int parameterCount() {
 		return featureExtractor.parameterCount() + flattener.parameterCount() + classifier.parameterCount();
+	}
+	
+	/**
+	 * Returns the sum of the sublayers in the {@linkplain #featureExtractor feature extractor},
+	 * {@linkplain #flattener flattener}, and {@linkplain #classifier classifier}.
+	 * 
+	 * @return total number of sublayers in this layer
+	 */
+	@Override
+	public int sublayers() {
+		return featureExtractor.sublayers() + flattener.sublayers() + classifier.sublayers();
 	}
 }

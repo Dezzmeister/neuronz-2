@@ -65,6 +65,20 @@ public abstract class ElementContainer<T> implements Serializable {
 	}
 	
 	/**
+	 * TODO: FIX THIS HACK
+	 * Unsafe version of {@link #plus(Object)} that exists for the parallel layer framework.
+	 * This should be fixed as soon as possible.
+	 * 
+	 * @param other other element container
+	 * @return this plus the other
+	 */
+	@SuppressWarnings("unchecked")
+	public T unsafePlus(final ElementContainer<?> other) {
+		final T container = (T) other;
+		return plus(container);
+	}
+	
+	/**
 	 * Subtracts <code>other</code> from <code>this</code>, element-wise.
 	 * 
 	 * @param other to be subtracted from <code>this</code>

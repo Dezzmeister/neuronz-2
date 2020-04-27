@@ -1,5 +1,10 @@
 package dezzy.neuronz2.arch.layers;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import dezzy.neuronz2.cnn.layers.PoolingLayer;
@@ -65,4 +70,48 @@ public interface Layer<I extends ElementContainer<I>, O extends ElementContainer
 	 * @return number of learnable parameters in the network
 	 */
 	public int parameterCount();
+	
+	/**
+	 * Returns the total number of sub-layers contained in this layer. Layers can be composed of one or more
+	 * "sub-layers" chained together, and this function returns the number of layers that have been
+	 * chained together to form this one.
+	 * <p>
+	 * <b>Note:</b> If a layer does not have any sublayers, then it should count itself as a sublayer, 
+	 * so any layer that is not a composition of layers should return a value of 1.
+	 * 
+	 * @return number of sublayers
+	 */
+	public int sublayers();
+	
+	/**
+	 * Saves this layer network to a file so that it can be run/trained later.
+	 * 
+	 * @param path path to file (will be created if it doesn't exist)
+	 * @throws IOException if there is a problem creating the {@link FileOutputStream} or {@link ObjectOutputStream}
+	 */
+	public static void saveAs(final Layer<?, ?> layer, final String path) throws IOException {
+		final FileOutputStream fos = new FileOutputStream(path);
+		final ObjectOutputStream oos = new ObjectOutputStream(fos);
+		
+		oos.writeObject(layer);
+		oos.close();
+	}
+	
+	/**
+	 * Loads a layer from a file. Layers can be saved to a file by {@link Layer#saveAs}.
+	 * 
+	 * @param path path to layer network file
+	 * @return a layer loaded from <code>path</code>
+	 * @throws IOException if there is a problem creating the {@link FileInputStream} or {@link ObjectInputStream}
+	 * @throws ClassNotFoundException if the file at <code>path</code> does not contain a {@link Layer}
+	 */
+	@SuppressWarnings("unchecked")
+	public static <I extends ElementContainer<I>, O extends ElementContainer<O>> Layer<I, O> loadFrom(final String path) throws IOException, ClassNotFoundException {
+		final FileInputStream fis = new FileInputStream(path);
+		final ObjectInputStream ois = new ObjectInputStream(fis);
+		final Layer<I, O> layer = (Layer<I, O>) ois.readObject();
+		
+		ois.close();
+		return layer;
+	}
 }

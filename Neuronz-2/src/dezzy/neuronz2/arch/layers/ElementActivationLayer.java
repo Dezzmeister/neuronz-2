@@ -1,5 +1,11 @@
 package dezzy.neuronz2.arch.layers;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.ParallelLayer;
 import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.FuncDerivPair;
 
@@ -10,7 +16,7 @@ import dezzy.neuronz2.math.constructs.FuncDerivPair;
  * @author Joe Desmond
  * @param <T> type of the input to this activation layer (i.e.; matrix, vector, etc.)
  */
-public class ElementActivationLayer<T extends ElementContainer<T>> implements Layer<T, T> {
+public class ElementActivationLayer<T extends ElementContainer<T>> implements ParallelLayer<T, T> {
 	
 	/**
 	 * 
@@ -88,6 +94,11 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 		
 	}
 	
+	@Override
+	public int sublayers() {
+		return 1;
+	}
+	
 	/**
 	 * Returns zero because there are no learnable parameters in this layer.
 	 * 
@@ -96,5 +107,37 @@ public class ElementActivationLayer<T extends ElementContainer<T>> implements La
 	@Override
 	public int parameterCount() {
 		return 0;
+	}
+
+	@Override
+	public ParallelForwardPass<T> parallelForwardPass(final T prevActivations) {
+		final Map<Layer<?, ?>, ElementContainer<?>> latestInputs = new HashMap<>();
+		final Map<Layer<?, ?>, ElementContainer<?>> latestOutputs = new HashMap<>();
+		
+		latestInputs.put(this, prevActivations);
+		
+		final T output = prevActivations.transform(activationFunction.function);
+		
+		latestOutputs.put(this, output);
+		
+		return new ParallelForwardPass<>(output, latestInputs, latestOutputs);
+	}
+
+	@Override
+	public ParallelBackwardPass<T> parallelBackprop(final ParallelForwardPass<T> prevForward, final T errorOutputDeriv, final boolean isFirstLayer) {
+		@SuppressWarnings("unchecked")
+		final T prevLatestOutput = (T) prevForward.latestOutputs.get(this);
+		
+		final T outputInputDeriv = prevLatestOutput.transform(activationFunction.derivative);
+		
+		final T output = errorOutputDeriv.hadamard(outputInputDeriv);
+		
+		return new ParallelBackwardPass<>(output, Map.of());
+	}
+
+	@Override
+	public void parallelUpdate(final ParallelBackwardPass<?> gradients, double learningRate) {
+		// TODO Auto-generated method stub
+		
 	}
 }

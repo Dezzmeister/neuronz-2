@@ -1,9 +1,16 @@
 package dezzy.neuronz2.ann.layers;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import dezzy.neuronz2.arch.ParallelBackwardPass;
+import dezzy.neuronz2.arch.ParallelForwardPass;
+import dezzy.neuronz2.arch.ParallelLayer;
 import dezzy.neuronz2.arch.init.WeightInitFunc;
 import dezzy.neuronz2.arch.layers.Layer;
+import dezzy.neuronz2.math.constructs.ElementContainer;
 import dezzy.neuronz2.math.constructs.Matrix;
 import dezzy.neuronz2.math.constructs.Vector;
 import dezzy.neuronz2.math.constructs.shape.MatrixShape;
@@ -14,7 +21,7 @@ import dezzy.neuronz2.math.constructs.shape.VectorShape;
  *
  * @author Joe Desmond
  */
-public class DenseLayer implements Layer<Vector, Vector> {
+public class DenseLayer implements ParallelLayer<Vector, Vector> {
 
 	/**
 	 * 
@@ -128,5 +135,53 @@ public class DenseLayer implements Layer<Vector, Vector> {
 	@Override
 	public int parameterCount() {
 		return bias.dimension + (weights.rows * weights.cols);
+	}
+	
+	@Override
+	public int sublayers() {
+		return 1;
+	}
+
+	@Override
+	public ParallelForwardPass<Vector> parallelForwardPass(final Vector prevActivations) {
+		final Map<Layer<?, ?>, ElementContainer<?>> latestInputs = new HashMap<>();
+		
+		final Vector multiplied = weights.multiply(prevActivations);
+		
+		latestInputs.put(this, prevActivations);
+		
+		final Vector nextActivations = multiplied.plus(bias);
+		
+		return new ParallelForwardPass<>(nextActivations, latestInputs, Map.of());
+	}
+
+	@Override
+	public ParallelBackwardPass<Vector> parallelBackprop(final ParallelForwardPass<Vector> prevForward, final Vector errorOutputDeriv, final boolean isFirstLayer) {
+		final Map<Layer<?, ?>, List<ElementContainer<?>>> gradients = new HashMap<>();
+		
+		final Vector prevLatestInput = (Vector) prevForward.latestInputs.get(this);
+		
+		final Matrix newWeightDeltas = errorOutputDeriv.outerProduct(prevLatestInput);
+		final Vector newBiasDeltas = errorOutputDeriv;
+		
+		gradients.put(this, List.of(newWeightDeltas, newBiasDeltas));
+		
+		final Vector output = isFirstLayer ? null : weights.transpose().multiply(errorOutputDeriv);
+		
+		return new ParallelBackwardPass<>(output, gradients);
+	}
+
+	@Override
+	public void parallelUpdate(final ParallelBackwardPass<?> gradients, final double learningRate) {
+		final List<ElementContainer<?>> gradientList = gradients.gradients.get(this);
+		
+		final Matrix prevWeightDeltas = (Matrix) gradientList.get(0);
+		final Vector prevBiasDeltas = (Vector) gradientList.get(1);
+		
+		final Matrix weightGradient = prevWeightDeltas.transform(w -> learningRate * w);
+		final Vector biasGradient = prevBiasDeltas.transform(b -> learningRate * b);
+		
+		weights = weights.minus(weightGradient);
+		bias = bias.minus(biasGradient);
 	}
 }
