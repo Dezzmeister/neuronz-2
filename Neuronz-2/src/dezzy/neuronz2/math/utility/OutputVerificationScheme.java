@@ -35,7 +35,6 @@ public interface OutputVerificationScheme {
 				greatestIndex = i;
 			}
 		}
-		//System.out.println(greatestValue + "\t" + greatestIndex + "\t" + expected.get(greatestIndex));
 		
 		return expected.get(greatestIndex) == 1;
 	};
