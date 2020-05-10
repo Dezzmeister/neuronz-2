@@ -13,7 +13,10 @@ import dezzy.neuronz2.network.NetworkRunner;
 import dezzy.neuronz2.network.ProcessingScheme;
 
 /**
- * Some example code demonstrating the use of the old architecture on the MNIST handwritten digit data.
+ * Example code demonstrating the use of the old architecture on the MNIST handwritten digit data.
+ * <p>
+ * <b>NOTE:</b> The new architecture should be used instead of the old one; example code for the new
+ * architecture can be found {@linkplain NewArchExample here}.
  *
  * @author Joe Desmond
  */
