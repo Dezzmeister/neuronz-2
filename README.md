@@ -30,7 +30,7 @@ There are two types of activation layers: `ElementActivationLayer` and `TensorAc
 
 
 ## Parallel Architecture (Temporary)
-**NOTE**: The parallel architecture is a temporary hack to improve training times until GPU optimizations are finished.
+**NOTE: The parallel architecture is a temporary hack to improve training times until GPU optimizations are finished.**
 
 The parallel architecture exploits multithreading and the parallel nature of mini-batch gradient descent to accelerate network training. A layer using the parallel architecture must implement `ParallelLayer`, which extends `Layer`. The `ParallelLayer` interface specifies three parallel versions of the methods specified in `Layer`. The difference is that the parallel methods must not modify the state of the layer, with the exception of `parallelUpdate()`. 
 
