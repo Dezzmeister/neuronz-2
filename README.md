@@ -3,6 +3,8 @@
 A deep learning library that lets you train and save neural networks with multiple hidden layers of various types.
 Example code for both architectures can be found in Neuronz-2/src/examplecode.
 
+Code specific to the Russianness project can be found in Neuronz-2/src/dezzy/neuronz2/russianness.
+
 
 ## Old Architecture (only supports fully connected layers):
 
