@@ -6,7 +6,8 @@ import dezzy.neuronz2.math.utility.DoubleApplier;
 import dezzy.neuronz2.math.utility.DoubleOperator;
 
 /**
- * Represents anything that contains a collection of <code>double</code> elements.
+ * Represents anything that contains a collection of <code>double</code> elements. The general pattern
+ * here is to keep subclasses of ElementContainer immutable. See {@link Vector} for an example.
  *
  * @author Joe Desmond
  */

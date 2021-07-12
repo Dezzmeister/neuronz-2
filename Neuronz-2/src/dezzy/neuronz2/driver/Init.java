@@ -3,7 +3,7 @@ package dezzy.neuronz2.driver;
 import static jcuda.driver.JCudaDriver.cuInit;
 
 import jcuda.driver.JCudaDriver;
-
+import jcuda.jcudnn.JCudnn;
 import jcuda.driver.CUresult;
 
 /**
@@ -23,6 +23,7 @@ public class Init {
 	
 	static {
 		JCudaDriver.setExceptionsEnabled(true);
+		//JCudnn.setExceptionsEnabled(true);
 		CUDA_DRIVER_STATUS_CODE = cuInit(0);
 	}
 }

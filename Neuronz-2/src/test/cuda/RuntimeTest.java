@@ -5,14 +5,18 @@ import dezzy.neuronz2.driver.meta.AttributeMap;
 import dezzy.neuronz2.driver.meta.Device;
 import dezzy.neuronz2.driver.meta.DeviceManager;
 import jcuda.Pointer;
+import jcuda.jcudnn.JCudnn;
 import jcuda.runtime.JCuda;
 
 @SuppressWarnings("unused")
 public class RuntimeTest {
 	
 	public static void main(final String[] args) {
-		System.out.println(Init.CUDA_DRIVER_STATUS_CODE); // Force JCuda to initialize by loading the Init class
+		final int[] versionPtr = new int[1];
 		
+		System.out.println(Init.CUDA_DRIVER_STATUS_CODE); // Force JCuda to initialize by loading the Init class
+		JCuda.cudaDriverGetVersion(versionPtr);
+		System.out.println(versionPtr[0]);
 		// pointerTest();
 		deviceTest();
 	}
@@ -29,6 +33,8 @@ public class RuntimeTest {
 				System.out.println(AttributeMap.map.get(attribute) + ": " + device.attributes.get(attribute));
 			}
 		}
+		System.out.println("\n================================\n");
+		System.out.println("cuDNN version: " + JCudnn.cudnnGetVersion());
 	}
 	
 	private static final void pointerTest() {

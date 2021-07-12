@@ -7,7 +7,8 @@ import dezzy.neuronz2.math.utility.DoubleOperator;
 import dezzy.neuronz2.math.utility.IndexedGenerator;
 
 /**
- * Represents a Vector with any number of elements.
+ * Represents a Vector with any number of elements. Vectors should not integrate with the JCuda API - 
+ * see {@link dezzy.neuronz2.cuda.math.GVector GVector} for a Vector usable with JCuda.
  *
  * @author Joe Desmond
  */
@@ -41,6 +42,19 @@ public class Vector extends ElementContainer<Vector> {
 		components = _components;
 		dimension = components.length;
 		length = calculateLength();
+	}
+	
+	/**
+	 * Protected copy constructor. Useful for subclasses to provide ways to construct themselves
+	 * from existing Vectors. A reference to the other vector's components is copied because it is
+	 * assumed that the components are immutable.
+	 * 
+	 * @param other vector to copy
+	 */
+	protected Vector(final Vector other) {
+		components = getComponents(other);
+		dimension = components.length;
+		length = other.length;
 	}
 	
 	/**
